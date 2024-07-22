@@ -21,14 +21,15 @@ int main() {
     mppi.setCollisionChecker(collision_checker);
 
     // Corridor
-    Corridor corridor;
-    int Nz = 3000;
-    double lambda_z = 1000.0;
-    double sigma_z = 0.3;
-    corridor.init(Nz, lambda_z, sigma_z);
-    corridor.setCollisionChecker(collision_checker);
-    std::vector<int> center_index = {0,1};
-    corridor.setCenterIndex(center_index);
+    Corridor corridor(model);
+    CorridorParam corridor_param;
+    corridor_param.Nz = 3000;
+    corridor_param.gamma_z = 1000.0;
+    corridor_param.sigma_z = 0.3;
+    corridor_param.lambda_c = 0.3;
+    corridor_param.lambda_r = 0.3;
+    corridor_param.center_index = {0,1};
+    corridor.init(corridor_param);
 
     // IPDDP
     Param param;
