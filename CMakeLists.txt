@@ -4,15 +4,14 @@ project(mppi_ipddp)
 find_package(PythonLibs REQUIRED)
 find_package (Eigen3 REQUIRED NO_MODULE)
 
-add_subdirectory(mppi)
-add_subdirectory(ipddp)
-
 # autodiff requires a c++17 enabled compiler
 set(CMAKE_CXX_STANDARD 17)          # ensure cmake instructs compiler to use C++17
 set(CMAKE_CXX_STANDARD_REQUIRED ON) # ensure the C++ standard given before is actually used
 set(CMAKE_CXX_EXTENSIONS OFF)       # avoid compile flags of the type -std=gnu++1z added by cmake
 
 include_directories(
+    mppi/mppi/
+    ipddp/ipddp/
     model/
     corridor/
     autodiff/
