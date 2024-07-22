@@ -21,8 +21,14 @@ int main() {
     mppi.setCollisionChecker(collision_checker);
 
     // Corridor
-    Corridor corridor()
-    corridor.setCollisionChecker(collision_checker);;
+    Corridor corridor;
+    int Nz = 3000;
+    double lambda_z = 1000.0;
+    double sigma_z = 0.3;
+    corridor.init(Nz, lambda_z, sigma_z);
+    corridor.setCollisionChecker(collision_checker);
+    std::vector<int> center_index = {0,1};
+    corridor.setCenterIndex(center_index);
 
     // IPDDP
     Param param;
@@ -34,14 +40,18 @@ int main() {
 
     Eigen::MatrixXd X;
     Eigen::MatrixXd U;
+    Eigen::MatrixXd C;
+    Eigen::VectorXd R;
 
     while (true) {
         mppi.solve();
-        Eigen::MatrixXd X = mppi.getResX();
-        Eigen::MatrixXd U = mppi.getResU();
+        X = mppi.getResX();
+        U = mppi.getResU();
         corridor.solve(X);
-
+        C = corridor.getResC();
+        R = corridor.getResR();
         ipddp.solve();
+        // ipddp.solve(X,U,C,R);
     }
 
     clock_t finish = clock();
