@@ -1,3 +1,6 @@
 [submodule "ipddp"]
 	path = ipddp
 	url = git@github.com:MC00614/ipddp_cpp.git
+[submodule "mppi"]
+	path = mppi
+	url = git@github.com:MC00614/mppi_cpp.git
