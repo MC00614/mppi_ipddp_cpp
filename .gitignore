@@ -1,0 +1,5 @@
+/.vscode
+/build
+/eigen
+/matplotlibcpp
+/autodiff
