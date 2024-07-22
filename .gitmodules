@@ -1,0 +1,3 @@
+[submodule "ipddp"]
+	path = ipddp
+	url = git@github.com:MC00614/ipddp_cpp.git
