@@ -11,9 +11,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)       # avoid compile flags of the type -std=gnu++
 
 include_directories(
     mppi/mppi/
-    ipddp/ipddp/
-    model/
     corridor/
+    ipddp/ipddp/
+
+    model/
     mppi_ipddp/
     autodiff/
     ${EIGEN3_INCLUDE_DIRS}

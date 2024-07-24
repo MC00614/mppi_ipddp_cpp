@@ -1,12 +1,11 @@
-#include "invpend.h"
-#include "cartpole.h"
+#include "wmrobot.h"
 
+#include "collision_checker.h"
 #include "mppi_ipddp.h"
 
 int main() {
     // Model
-    // auto model = InvPend();
-    auto model = CartPole();
+    auto model = WMRobot();
 
     clock_t start = clock();
 
@@ -23,7 +22,6 @@ int main() {
     corridor_param.sigma_z = 0.3;
     corridor_param.lambda_c = 0.3;
     corridor_param.lambda_r = 0.3;
-    corridor_param.center_index = {0,1};
 
     // IPDDP Parameter
     Param ipddp_param;
@@ -39,7 +37,9 @@ int main() {
     mppi_ipddp.init(mppi_param, corridor_param, ipddp_param);
     mppi_ipddp.setCollisionChecker(collision_checker);
 
+    std::cout<<"SOLVE1"<<std::endl;
     mppi_ipddp.solve();
+    std::cout<<"SOLVE2"<<std::endl;
 
     clock_t finish = clock();
     double duration = (double)(finish - start) / CLOCKS_PER_SEC;

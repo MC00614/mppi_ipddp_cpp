@@ -6,5 +6,4 @@ struct CorridorParam {
     double sigma_z;
     double lambda_c;
     double lambda_r;
-    std::vector<int> center_index;
 };

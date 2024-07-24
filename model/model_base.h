@@ -6,6 +6,8 @@ using namespace autodiff;
 
 #include <eigen3/Eigen/Dense>
 
+#include <iostream>
+
 class ModelBase {
 public:
     ModelBase();
@@ -15,6 +17,7 @@ public:
     int dim_x;
     int dim_u;
     int dim_c;
+    int center_point;
     Eigen::MatrixXd X;
     Eigen::MatrixXd U;
     Eigen::MatrixXd Y;
@@ -28,7 +31,7 @@ public:
     // Terminal Cost Function
     std::function<dual2nd(VectorXdual2nd)> p;
     // Constraint
-    std::function<VectorXdual2nd(VectorXdual2nd, VectorXdual2nd)> c;
+    std::function<VectorXdual2nd(VectorXdual2nd, VectorXdual2nd, Eigen::MatrixXd, Eigen::VectorXd)> c;
 };
 
 ModelBase::ModelBase() {
