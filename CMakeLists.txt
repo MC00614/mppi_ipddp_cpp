@@ -14,6 +14,7 @@ include_directories(
     ipddp/ipddp/
     model/
     corridor/
+    mppi_ipddp/
     autodiff/
     ${EIGEN3_INCLUDE_DIRS}
     matplotlibcpp/

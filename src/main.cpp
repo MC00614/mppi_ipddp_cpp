@@ -1,27 +1,22 @@
 #include "invpend.h"
 #include "cartpole.h"
 
-#include "mppi.h"
-#include "corridor.h"
-#include "ipddp.h"
+#include "mppi_ipddp.h"
 
 int main() {
+    // Model
     // auto model = InvPend();
     auto model = CartPole();
 
     clock_t start = clock();
 
-    // MPPI
-    MPPI mppi(model);
-    int Nu = 100;
-    double lambda = 1.0;
-    double sigma_u = 1.0;
-    mppi.init(Nu, lambda, sigma_u);
-    CollisionChecker *collision_checker;
-    mppi.setCollisionChecker(collision_checker);
-
-    // Corridor
-    Corridor corridor(model);
+    // MPPI Parameter
+    MPPIParam mppi_param;
+    mppi_param.Nu = 100;
+    mppi_param.gamma_u = 1.0;
+    mppi_param.sigma_u = 1.0;
+    
+    // Corridor Parameter
     CorridorParam corridor_param;
     corridor_param.Nz = 3000;
     corridor_param.gamma_z = 1000.0;
@@ -29,31 +24,22 @@ int main() {
     corridor_param.lambda_c = 0.3;
     corridor_param.lambda_r = 0.3;
     corridor_param.center_index = {0,1};
-    corridor.init(corridor_param);
 
-    // IPDDP
-    Param param;
-    param.tolerance = 1e-7;
-    param.max_iter = 100;
-    param.mu = 0;
-    IPDDP ipddp(model);
-    ipddp.init(param);
+    // IPDDP Parameter
+    Param ipddp_param;
+    ipddp_param.tolerance = 1e-7;
+    ipddp_param.max_iter = 100;
+    ipddp_param.mu = 0;
 
-    Eigen::MatrixXd X;
-    Eigen::MatrixXd U;
-    Eigen::MatrixXd C;
-    Eigen::VectorXd R;
+    // Collision Checker
+    CollisionChecker *collision_checker;
 
-    while (true) {
-        mppi.solve();
-        X = mppi.getResX();
-        U = mppi.getResU();
-        corridor.solve(X);
-        C = corridor.getResC();
-        R = corridor.getResR();
-        ipddp.solve();
-        // ipddp.solve(X,U,C,R);
-    }
+    // MPPI_IPDDP
+    MPPI_IPDDP mppi_ipddp(model);
+    mppi_ipddp.init(mppi_param, corridor_param, ipddp_param);
+    mppi_ipddp.setCollisionChecker(collision_checker);
+
+    mppi_ipddp.solve();
 
     clock_t finish = clock();
     double duration = (double)(finish - start) / CLOCKS_PER_SEC;

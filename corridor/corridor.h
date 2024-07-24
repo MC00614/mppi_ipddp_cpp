@@ -8,7 +8,7 @@ public:
     ~Corridor();
     void init(CorridorParam corridor_param);
     void setCollisionChecker(CollisionChecker *collision_checker);
-    void solve(const Eigen::MatrixXd &X);
+    void solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::VectorXd &R);
 
     Eigen::MatrixXd getResC();
     Eigen::VectorXd getResR();
@@ -55,7 +55,7 @@ void Corridor::setCollisionChecker(CollisionChecker *collision_checker) {
     this->collision_checker = collision_checker;
 }
 
-void Corridor::solve(const Eigen::MatrixXd &X) {
+void Corridor::solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::VectorXd &R) {
     // not sufficiently inflated?
     double cost;
     
@@ -82,6 +82,9 @@ void Corridor::solve(const Eigen::MatrixXd &X) {
     for (int i = 0; i < Nz; ++i) {
         Z += Zi.middleRows(i * (center_index_size + 1), center_index_size + 1) * weights(i);
     }
+
+    C = this->Z.topRows(center_index_size);
+    R = this->Z.bottomRows(1);
 }
 
 Eigen::MatrixXd Corridor::getResC() {
