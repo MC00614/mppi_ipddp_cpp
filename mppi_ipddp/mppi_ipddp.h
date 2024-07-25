@@ -11,21 +11,25 @@ public:
 
     void init(MPPIParam mppi_param, CorridorParam corridor_param, Param ipddp_param);
     void setCollisionChecker(CollisionChecker *collision_checker);
-    void solve();
+    void solve(int iter);
+    void move();
+
+    Eigen::MatrixXd X;
+    Eigen::MatrixXd U;
+    Eigen::MatrixXd C;
+    Eigen::VectorXd R;
 
 private:
     MPPI mppi;
     Corridor corridor;
     IPDDP ipddp;
 
+    std::function<VectorXdual2nd(VectorXdual2nd, VectorXdual2nd)> f;
+
     int N;
     int dim_x;
     int dim_u;
     int center_point;
-    Eigen::MatrixXd X;
-    Eigen::MatrixXd U;
-    Eigen::MatrixXd C;
-    Eigen::VectorXd R;
 };
 
 MPPI_IPDDP::MPPI_IPDDP(ModelBase model)
@@ -34,6 +38,8 @@ MPPI_IPDDP::MPPI_IPDDP(ModelBase model)
     dim_x = model.dim_x;
     dim_u = model.dim_u;
     center_point = model.center_point;
+
+    f = model.f;
 
     X = model.X;
     U = model.U;
@@ -56,13 +62,39 @@ void MPPI_IPDDP::setCollisionChecker(CollisionChecker *collision_checker) {
     corridor.setCollisionChecker(collision_checker);
 }
 
-void MPPI_IPDDP::solve() {
-    while (true) {
+void MPPI_IPDDP::solve(int iter) {
+    clock_t start;
+    clock_t finish;
+    double mppi_duration = 0.0;
+    double corridor_duration = 0.0;
+    double ipddp_duration = 0.0;
+
+    for (int i = 0; i < iter; ++i) {
+        start = clock();
+        // std::cout<<"mppi"<<std::endl;
         mppi.solve(X, U);
-        std::cout<<"mppi"<<std::endl;
+        finish = clock();
+        mppi_duration += (double)(finish - start) / CLOCKS_PER_SEC;
+
+        start = clock();
+        // std::cout<<"corridor"<<std::endl;
         corridor.solve(X, C, R);
-        std::cout<<"corridor"<<std::endl;
+        finish = clock();
+        corridor_duration += (double)(finish - start) / CLOCKS_PER_SEC;
+
+        start = clock();
+        // std::cout<<"ipddp"<<std::endl;
         ipddp.solve(X, U, C, R);
-        std::cout<<"ipddp"<<std::endl;
+        finish = clock();
+        ipddp_duration += (double)(finish - start) / CLOCKS_PER_SEC;
     }
+    std::cout << "MPPI : " << mppi_duration << " Seconds" << std::endl;
+    std::cout << "CORRIDOR : " << corridor_duration << " Seconds" << std::endl;
+    std::cout << "IPDDP : " << ipddp_duration << " Seconds" << std::endl;
+}
+
+void MPPI_IPDDP::move() {
+    X.leftCols(N-1) = X.rightCols(N-1);
+    U.leftCols(N-1) = U.rightCols(N-1);
+    X.col(N) = f(X.col(N-1), U.col(N-1)).cast<double>();
 }

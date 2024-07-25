@@ -32,6 +32,8 @@ public:
     std::function<dual2nd(VectorXdual2nd)> p;
     // Constraint
     std::function<VectorXdual2nd(VectorXdual2nd, VectorXdual2nd, Eigen::MatrixXd, Eigen::VectorXd)> c;
+
+    std::function<Eigen::MatrixXd(Eigen::MatrixXd)> h;
 };
 
 ModelBase::ModelBase() {

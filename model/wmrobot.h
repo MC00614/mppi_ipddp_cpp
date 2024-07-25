@@ -11,12 +11,12 @@ public:
 
 WMRobot::WMRobot() {
     // Stage Count
-    N = 30;
+    N = 50;
 
     // Dimensions
     dim_x = 3;
     dim_u = 2;
-    dim_c = consts + 2*N;
+    dim_c = consts + (2 * N);
 
     center_point = 2;
 
@@ -66,11 +66,21 @@ WMRobot::WMRobot() {
         c_n(2) = u(1) - 1.5;
         c_n(3) = - u(1) - 1.5;
         for (int i = 0; i < N; ++i) {
-            dual2nd distance = (x.topRows(center_point) - C.col(i)).lpNorm<2>();
+            dual2nd distance = (x.topRows(center_point) - C.col(i)).norm();
             c_n(consts + (2*i)) = distance - R(i);
             c_n(consts + (2*i) + 1) = - distance - R(i);
         }
         return c_n;
+    };
+
+    h = [this](Eigen::MatrixXd U) -> Eigen::MatrixXd{
+        for (int i = 0; i < N; ++i) {
+            if (U.col(i)(0) < 0.0) {U.col(i)(0) = 0.0;}
+            else if (1.5 < U.col(i)(0)) {U.col(i)(0) = 1.5;}
+            if (U.col(i)(1) < -1.5) {U.col(i)(1) = -1.5;}
+            else if (1.5 < U.col(i)(1)) {U.col(i)(1) = 1.5;}
+        }
+        return U;
     };
 }
 
