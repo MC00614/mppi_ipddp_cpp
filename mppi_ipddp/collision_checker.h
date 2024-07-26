@@ -71,26 +71,43 @@ bool CollisionChecker::getCollisionCircle(const Eigen::MatrixXd &z) {
     double dc;
     // Circle
     for (int i = 0; i < circles.size(); ++i) {
-        for (int j = 0; j < z.cols(); ++j) {
-            zj = z.col(j);
-            dx = circles[i][0] - zj(0);
-            dy = circles[i][1] - zj(1);
-            distance_2 = (dx * dx) + (dy * dy);
-            dc = circles[i][2] + zj(2);
-            if (distance_2 <= (dc*dc)) {return true;}
-            else {continue;}
-        }
+        dx = circles[i][0] - z(0);
+        dy = circles[i][1] - z(1);
+        distance_2 = (dx * dx) + (dy * dy);
+        dc = circles[i][2] + z(2);
+        if (distance_2 <= (dc*dc)) {return true;}
+        else {continue;}
     }
     // Rectangle
     for (int i = 0; i < rectangles.size(); ++i) {
-        for (int j = 0; j < z.cols(); ++j) {
-            zj = z.col(j);
-            if ((zj(0) + zj(2)) < rectangles[i][0]) {continue;}
-            else if (rectangles[i][1] < (zj(0) - zj(2))) {continue;}
-            else if ((zj(1) + zj(2)) < rectangles[i][2]) {continue;}
-            else if (rectangles[i][3] < (zj(1) - zj(2))) {continue;}
-            else {return true;}
-        }
+        if ((z(0) + z(2)) < rectangles[i][0]) {continue;}
+        else if (rectangles[i][1] < (z(0) - z(2))) {continue;}
+        else if ((z(1) + z(2)) < rectangles[i][2]) {continue;}
+        else if (rectangles[i][3] < (z(1) - z(2))) {continue;}
+        else {return true;}
     }
+    // // Circle
+    // for (int i = 0; i < circles.size(); ++i) {
+    //     for (int j = 0; j < z.cols(); ++j) {
+    //         zj = z.col(j);
+    //         dx = circles[i][0] - zj(0);
+    //         dy = circles[i][1] - zj(1);
+    //         distance_2 = (dx * dx) + (dy * dy);
+    //         dc = circles[i][2] + zj(2);
+    //         if (distance_2 <= (dc*dc)) {return true;}
+    //         else {continue;}
+    //     }
+    // }
+    // // Rectangle
+    // for (int i = 0; i < rectangles.size(); ++i) {
+    //     for (int j = 0; j < z.cols(); ++j) {
+    //         zj = z.col(j);
+    //         if ((zj(0) + zj(2)) < rectangles[i][0]) {continue;}
+    //         else if (rectangles[i][1] < (zj(0) - zj(2))) {continue;}
+    //         else if ((zj(1) + zj(2)) < rectangles[i][2]) {continue;}
+    //         else if (rectangles[i][3] < (zj(1) - zj(2))) {continue;}
+    //         else {return true;}
+    //     }
+    // }
     return false;
 }

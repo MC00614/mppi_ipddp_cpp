@@ -31,14 +31,15 @@ int main() {
     // IPDDP Parameter
     Param ipddp_param;
     ipddp_param.tolerance = 1e-7;
-    ipddp_param.max_iter = 100;
+    ipddp_param.max_iter = 1;
     ipddp_param.mu = 0;
     ipddp_param.infeasible = true;
     ipddp_param.q = 0.001;
 
     // Collision Checker
     CollisionChecker collision_checker;
-    // collision_checker.addRectangle(-2.5, 2.0, 3.0, 2.0);
+    collision_checker.addRectangle(-2.5, 2.0, 3.0, 2.0);
+    collision_checker.addRectangle(1.0, 2.0, 3.0, 2.0);
     collision_checker.addCircle(0.5, 1.0, 0.25);
 
     // MPPI_IPDDP
@@ -49,11 +50,11 @@ int main() {
     // clock_t start = clock();
 
     // mppi_ipddp.solve(0);
-    for (int t = 0; t < 10; ++t) {
+    for (int t = 0; t < 1000; ++t) {
         mppi_ipddp.solve(10);
         mppi_ipddp.move();
 
-        show2D(mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
+        show2D(mppi_ipddp.mppi_X, mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
     }
 
     // clock_t finish = clock();

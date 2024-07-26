@@ -65,10 +65,10 @@ WMRobot::WMRobot() {
         c_n(1) = - u(0);
         c_n(2) = u(1) - 1.5;
         c_n(3) = - u(1) - 1.5;
+        VectorXdual2nd distances = (x.topRows(center_point).replicate(1, N) - C).colwise().norm();
         for (int i = 0; i < N; ++i) {
-            dual2nd distance = (x.topRows(center_point) - C.col(i)).norm();
-            c_n(consts + (2*i)) = distance - R(i);
-            c_n(consts + (2*i) + 1) = - distance - R(i);
+            c_n(consts + (2*i)) = distances(i) - R(i);
+            c_n(consts + (2*i) + 1) = - distances(i) - R(i);
         }
         return c_n;
     };
