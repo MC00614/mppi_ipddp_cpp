@@ -38,7 +38,7 @@ int main() {
 
     // Collision Checker
     CollisionChecker collision_checker;
-    collision_checker.addRectangle(-2.5, 2.0, 3.0, 2.0);
+    // collision_checker.addRectangle(-2.5, 2.0, 3.0, 2.0);
     collision_checker.addCircle(0.5, 1.0, 0.25);
 
     // MPPI_IPDDP

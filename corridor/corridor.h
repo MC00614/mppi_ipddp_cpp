@@ -62,7 +62,6 @@ void Corridor::setCollisionChecker(CollisionChecker *collision_checker) {
 }
 
 void Corridor::solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::VectorXd &R) {
-    // not sufficiently inflated?
     double distance;
     double cost;
     double min_cost;
@@ -70,12 +69,13 @@ void Corridor::solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::Vector
 
     Z.topRows(center_point) = X.topRows(center_point).leftCols(N);
     Z.bottomRows(1) = Eigen::MatrixXd::Zero(1, N);
-    
+
     for (int iter = 0; iter < max_iter; ++iter) {
         for (int i = 0; i < Nz; ++i) {
             cost = 0.0;
             Zi.middleRows(i * (center_point + 1), center_point + 1) = Z + (this->sigma_z * Eigen::MatrixXd::Random(center_point + 1, N));
-            hz(i, X);
+
+            // hz(i, X);
 
             if (collision_checker->getCollisionCircle(Zi.middleRows(i * (center_point + 1), center_point + 1))) {
                 cost = 1e8;
@@ -97,7 +97,6 @@ void Corridor::solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::Vector
         }
         hz(X);
     }
-    // std::cout<<"min_cost = "<<min_cost<<std::endl;
     C = Z.topRows(center_point);
     R = Z.bottomRows(1).transpose();
 }
@@ -112,11 +111,12 @@ void Corridor::hz(int i, const Eigen::MatrixXd &X) {
         else if (radius < 0.0) {radius = -radius;}
         else if (r_max < radius) {radius = r_max;}
         Zi(i * (center_point + 1) + center_point, j) = radius;
-        distance_vector = Zi.col(j).middleRows(i * (center_point + 1), center_point) - X.topRows(center_point).col(j);
-        distance = distance_vector.norm();
-        if (radius < distance) {
-            Zi.col(j).middleRows(i * (center_point + 1), center_point) = X.topRows(center_point).col(j) + radius/distance * distance_vector;
-        }
+        
+        // distance_vector = Zi.col(j).middleRows(i * (center_point + 1), center_point) - X.topRows(center_point).col(j);
+        // distance = distance_vector.norm();
+        // if (radius < distance) {
+        //     Zi.col(j).middleRows(i * (center_point + 1), center_point) = X.topRows(center_point).col(j) + radius/distance * distance_vector;
+        // }
     }
 };
 
@@ -131,11 +131,11 @@ void Corridor::hz(const Eigen::MatrixXd &X) {
         else if (r_max < radius) {radius = r_max;}
         Z(center_point, j) = radius;
 
-        distance_vector = Z.topRows(center_point).col(j) - X.topRows(center_point).col(j);
-        distance = distance_vector.norm();
-        if (radius < distance) {
-            Z.topRows(center_point).col(j) = X.topRows(center_point).col(j) + radius/distance * distance_vector;
-        }
+        // distance_vector = Z.topRows(center_point).col(j) - X.topRows(center_point).col(j);
+        // distance = distance_vector.norm();
+        // if (radius < distance) {
+        //     Z.topRows(center_point).col(j) = X.topRows(center_point).col(j) + radius/distance * distance_vector;
+        // }
 
         // if (radius < (Z.col(j).topRows(center_point) - X.topRows(center_point).col(j)).norm()) {
         //     Z.col(j).topRows(center_point) = X.topRows(center_point).col(j);
