@@ -21,6 +21,7 @@ public:
 
     // TEMP
     Eigen::MatrixXd mppi_X;
+    Eigen::MatrixXd mppi_U;
 
 private:
     MPPI mppi;
@@ -81,6 +82,7 @@ void MPPI_IPDDP::solve(int iter) {
 
         // TEMP
         mppi_X = X;
+        mppi_U = U;
 
         start = clock();
         // std::cout<<"corridor"<<std::endl;
@@ -93,8 +95,6 @@ void MPPI_IPDDP::solve(int iter) {
         ipddp.solve(X, U, C, R);
         finish = clock();
         ipddp_duration += (double)(finish - start) / CLOCKS_PER_SEC;
-
-        // std::cout<<"RES = \n"<<mppi_X - X<<std::endl;
     }
     std::cout << "MPPI : " << mppi_duration << " Seconds" << std::endl;
     std::cout << "CORRIDOR : " << corridor_duration << " Seconds" << std::endl;

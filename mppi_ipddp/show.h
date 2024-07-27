@@ -2,18 +2,32 @@
 
 namespace plt = matplotlibcpp;
 
-void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &X, const Eigen::MatrixXd &U, const Eigen::MatrixXd &C, const Eigen::VectorXd &R,
+void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &mppi_U, const Eigen::MatrixXd &X, const Eigen::MatrixXd &U, const Eigen::MatrixXd &C, const Eigen::VectorXd &R,
             const std::vector<std::array<double,4>> &circles, const std::vector<std::array<double,4>> &rectangles) {
+
+    plt::subplot(2,2,1);
     std::vector<std::vector<double>> X_MPPI(X.rows(), std::vector<double>(X.cols()));
     for (int i = 0; i < X.rows(); ++i) {
         for (int j = 0; j < X.cols(); ++j) {
             X_MPPI[i][j] = mppi_X(i, j);
         }
     }
+    std::vector<std::vector<double>> U_MPPI(U.rows(), std::vector<double>(U.cols()));
+    for (int i = 0; i < U.rows(); ++i) {
+        for (int j = 0; j < U.cols(); ++j) {
+            U_MPPI[i][j] = mppi_U(i, j);
+        }
+    }
     std::vector<std::vector<double>> X_RES(X.rows(), std::vector<double>(X.cols()));
     for (int i = 0; i < X.rows(); ++i) {
         for (int j = 0; j < X.cols(); ++j) {
             X_RES[i][j] = X(i, j);
+        }
+    }
+    std::vector<std::vector<double>> U_RES(U.rows(), std::vector<double>(U.cols()));
+    for (int i = 0; i < U.rows(); ++i) {
+        for (int j = 0; j < U.cols(); ++j) {
+            U_RES[i][j] = U(i, j);
         }
     }
 
@@ -53,9 +67,16 @@ void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &X, const Eigen
     // plt::plot(C_RES[0], C_RES[1], "g");
     plt::plot(X_RES[0], X_RES[1], "k");
     plt::plot(X_MPPI[0], X_MPPI[1], "g");
-
     plt::xlim(-4, 4);
     plt::ylim(-1, 7);
+    plt::grid(true);
+
+    plt::subplot(2,2,2);
+    plt::plot(U_MPPI[0], "g");
+    plt::plot(U_RES[0], "k");
+    plt::subplot(2,2,3);
+    plt::plot(U_MPPI[1], "g");
+    plt::plot(U_RES[1], "k");
     plt::grid(true);
     plt::show();
 }

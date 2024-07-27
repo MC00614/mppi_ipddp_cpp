@@ -27,7 +27,7 @@ add_executable(${PROJECT_NAME}
 )
 
 # add_compile_options(-march=native)
-target_compile_options(${PROJECT_NAME} PRIVATE -O2)
+target_compile_options(${PROJECT_NAME} PRIVATE -O3)
 
 target_link_libraries(${PROJECT_NAME}
     ${PYTHON_LIBRARIES}

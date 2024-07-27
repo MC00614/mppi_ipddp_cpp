@@ -52,9 +52,10 @@ int main() {
     // mppi_ipddp.solve(0);
     for (int t = 0; t < 1000; ++t) {
         mppi_ipddp.solve(10);
-        mppi_ipddp.move();
 
-        show2D(mppi_ipddp.mppi_X, mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
+        show2D(mppi_ipddp.mppi_X, mppi_ipddp.mppi_U, mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
+
+        mppi_ipddp.move();
     }
 
     // clock_t finish = clock();
