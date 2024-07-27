@@ -31,8 +31,8 @@ int main() {
     // IPDDP Parameter
     Param ipddp_param;
     ipddp_param.tolerance = 1e-7;
-    ipddp_param.max_iter = 100;
-    ipddp_param.mu = 0;
+    ipddp_param.max_iter = 500;
+    ipddp_param.mu = 0.01;
     ipddp_param.infeasible = true;
     ipddp_param.q = 0.001;
 

@@ -16,7 +16,7 @@ WMRobot::WMRobot() {
     // Dimensions
     dim_x = 3;
     dim_u = 2;
-    dim_c = consts + (2 * N);
+    dim_c = consts + 2;
 
     center_point = 2;
 
@@ -32,7 +32,7 @@ WMRobot::WMRobot() {
 
     Y = 0.01*Eigen::MatrixXd::Ones(dim_c, N);
 
-    S = 0.1*Eigen::MatrixXd::Ones(dim_c, N);
+    S = 0.01*Eigen::MatrixXd::Ones(dim_c, N);
     
     // Discrete Time System
     auto f0 = [this](const VectorXdual2nd& x, const VectorXdual2nd& u) -> dual2nd {
@@ -59,17 +59,15 @@ WMRobot::WMRobot() {
     };
 
     // Constraint
-    c = [this](const VectorXdual2nd& x, const VectorXdual2nd& u, const Eigen::MatrixXd &C, const Eigen::VectorXd &R) -> VectorXdual2nd {    
+    c = [this](const VectorXdual2nd& x, const VectorXdual2nd& u, const VectorXdual2nd& C, const dual2nd& R) -> VectorXdual2nd {    
         VectorXdual2nd c_n(dim_c);
         c_n(0) = u(0) - 1.5;
         c_n(1) = - u(0);
         c_n(2) = u(1) - 1.5;
         c_n(3) = - u(1) - 1.5;
-        VectorXdual2nd distances = (x.topRows(center_point).replicate(1, N) - C).colwise().norm();
-        for (int i = 0; i < N; ++i) {
-            c_n(consts + (2*i)) = distances(i) - R(i);
-            c_n(consts + (2*i) + 1) = - distances(i) - R(i);
-        }
+        dual2nd distances = (x.topRows(center_point) - C).norm();
+        c_n(consts) = distances - R;
+        c_n(consts + 1) = - distances - R;
         return c_n;
     };
 

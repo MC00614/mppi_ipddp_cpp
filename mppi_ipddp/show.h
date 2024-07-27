@@ -50,9 +50,9 @@ void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &X, const Eigen
         }
     }
 
-    plt::plot(C_RES[0], C_RES[1], "g");
+    // plt::plot(C_RES[0], C_RES[1], "g");
     plt::plot(X_RES[0], X_RES[1], "k");
-    plt::plot(X_MPPI[0], X_MPPI[1], "r");
+    plt::plot(X_MPPI[0], X_MPPI[1], "g");
 
     plt::xlim(-4, 4);
     plt::ylim(-1, 7);
