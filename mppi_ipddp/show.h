@@ -54,7 +54,7 @@ inline void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &mppi_U,
             cx.push_back(C.col(i)(0) + R(i)*cos(t/180.0*M_PI));
             cy.push_back(C.col(i)(1) + R(i)*sin(t/180.0*M_PI));
         }
-        plt::plot(cx, cy, "c");
+        plt::plot(cx, cy, "silver");
     }
 
     std::vector<std::vector<double>> C_RES(C.rows(), std::vector<double>(C.cols()));
@@ -65,9 +65,9 @@ inline void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &mppi_U,
     }
 
     // plt::plot(C_RES[0], C_RES[1], "g");
-    plt::named_plot("MPPI-IPDDP", X_RES[0], X_RES[1], "b");
+    plt::named_plot("MPPI", X_MPPI[0], X_MPPI[1], "b");
     plt::scatter(X_RES[0], X_RES[1]);
-    plt::named_plot("MPPI", X_MPPI[0], X_MPPI[1], "r");
+    plt::named_plot("MPPI-IPDDP", X_RES[0], X_RES[1], "r");
     plt::scatter(X_MPPI[0], X_MPPI[1]);
     plt::xlim(-4, 4);
     plt::ylim(-1, 7);
@@ -93,9 +93,9 @@ inline void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &mppi_U,
         plt::plot(cx, cy, "k");
     }
 
-    plt::named_plot("MPPI-IPDDP", X_RES[0], X_RES[1], "b");
+    plt::named_plot("MPPI", X_MPPI[0], X_MPPI[1], "b");
     plt::scatter(X_RES[0], X_RES[1]);
-    plt::named_plot("MPPI", X_MPPI[0], X_MPPI[1], "r");
+    plt::named_plot("MPPI-IPDDP", X_RES[0], X_RES[1], "r");
     plt::scatter(X_MPPI[0], X_MPPI[1]);
     plt::xlim(-4, 4);
     plt::ylim(-1, 7);
