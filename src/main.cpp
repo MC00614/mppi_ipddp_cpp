@@ -13,7 +13,8 @@ int main() {
     mppi_param.Nu = 5000;
     mppi_param.gamma_u = 100.0;
     Eigen::VectorXd sigma_u(model.dim_u);
-    sigma_u << 0.25, 0.25;
+    // CHECK!
+    sigma_u << 0.3, 0.7;
     mppi_param.sigma_u = sigma_u.asDiagonal();
     
     // Corridor Parameter
@@ -51,7 +52,7 @@ int main() {
 
     // mppi_ipddp.solve(0);
     for (int t = 0; t < 1000; ++t) {
-        mppi_ipddp.solve(10);
+        mppi_ipddp.solve(1);
 
         show2D(mppi_ipddp.mppi_X, mppi_ipddp.mppi_U, mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
 

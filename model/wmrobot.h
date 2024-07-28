@@ -55,7 +55,7 @@ WMRobot::WMRobot() {
 
     // Terminal Cost Function
     p = [this](const VectorXdual2nd& x) -> dual2nd {
-        return 300.0 * (x(0)*x(0) + (x(1)-6)*(x(1)-6) + (x(2)-M_PI_2)*(x(2)-M_PI_2));
+        return 300.0 * (x(0)*x(0) + (x(1)-6.0)*(x(1)-6.0) + (x(2)-M_PI_2)*(x(2)-M_PI_2));
     };
 
     // Constraint

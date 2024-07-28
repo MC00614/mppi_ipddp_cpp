@@ -95,8 +95,6 @@ void MPPI_IPDDP::solve(int iter) {
         ipddp.solve(X, U, C, R);
         finish = clock();
         ipddp_duration += (double)(finish - start) / CLOCKS_PER_SEC;
-        std::cout << "MPPI_U : " << mppi_U.col(0)(0)<< std::endl;
-        std::cout << "RES_U : " << U.col(0)(0)<< std::endl;
     }
     std::cout << "MPPI : " << mppi_duration << " Seconds" << std::endl;
     std::cout << "CORRIDOR : " << corridor_duration << " Seconds" << std::endl;
