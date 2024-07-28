@@ -16,7 +16,7 @@ WMRobot::WMRobot() {
     // Dimensions
     dim_x = 3;
     dim_u = 2;
-    dim_c = consts + 2;
+    dim_c = consts + 1;
 
     center_point = 2;
 
@@ -65,9 +65,7 @@ WMRobot::WMRobot() {
         c_n(1) = - u(0);
         c_n(2) = u(1) - 1.5;
         c_n(3) = - u(1) - 1.5;
-        dual2nd distances = (x.topRows(center_point) - C).norm();
-        c_n(consts) = distances - R;
-        c_n(consts + 1) = - distances - R;
+        c_n(consts) = (x.topRows(center_point) - C).squaredNorm() - (R*R);
         return c_n;
     };
 

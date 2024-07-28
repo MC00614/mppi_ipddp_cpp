@@ -69,6 +69,11 @@ void Corridor::solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::Vector
 
     Z.topRows(center_point) = X.topRows(center_point).leftCols(N);
     Z.bottomRows(1) = Eigen::MatrixXd::Zero(1, N);
+    
+    // TEMP
+    C = X.topRows(center_point).leftCols(N).array();
+    R = 0.5 * Eigen::VectorXd::Ones(N);
+    return;
 
     for (int iter = 0; iter < max_iter; ++iter) {
         for (int t = 0; t < N; ++t) {

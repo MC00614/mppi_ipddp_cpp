@@ -2,7 +2,7 @@
 
 namespace plt = matplotlibcpp;
 
-void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &mppi_U, const Eigen::MatrixXd &X, const Eigen::MatrixXd &U, const Eigen::MatrixXd &C, const Eigen::VectorXd &R,
+inline void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &mppi_U, const Eigen::MatrixXd &X, const Eigen::MatrixXd &U, const Eigen::MatrixXd &C, const Eigen::VectorXd &R,
             const std::vector<std::array<double,4>> &circles, const std::vector<std::array<double,4>> &rectangles) {
 
     plt::subplot(2,2,1);
@@ -66,7 +66,9 @@ void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &mppi_U, const 
 
     // plt::plot(C_RES[0], C_RES[1], "g");
     plt::plot(X_RES[0], X_RES[1], "k");
+    plt::scatter(X_RES[0], X_RES[1]);
     plt::plot(X_MPPI[0], X_MPPI[1], "g");
+    plt::scatter(X_MPPI[0], X_MPPI[1]);
     plt::xlim(-4, 4);
     plt::ylim(-1, 7);
     plt::grid(true);
@@ -74,9 +76,13 @@ void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &mppi_U, const 
     plt::subplot(2,2,2);
     plt::plot(U_MPPI[0], "g");
     plt::plot(U_RES[0], "k");
+    plt::grid(true);
+    plt::title("U Dimension " + std::to_string(0), {{"fontsize", "20"}});
+
     plt::subplot(2,2,3);
     plt::plot(U_MPPI[1], "g");
     plt::plot(U_RES[1], "k");
+    plt::title("U Dimension " + std::to_string(1), {{"fontsize", "20"}});
     plt::grid(true);
     plt::show();
 }
