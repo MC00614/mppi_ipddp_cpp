@@ -99,6 +99,7 @@ void MPPI_IPDDP::solve(int iter) {
     std::cout << "MPPI : " << mppi_duration << " Seconds" << std::endl;
     std::cout << "CORRIDOR : " << corridor_duration << " Seconds" << std::endl;
     std::cout << "IPDDP : " << ipddp_duration << " Seconds" << std::endl;
+    std::cout << "Total : " << mppi_duration+corridor_duration+ipddp_duration << " Seconds" << std::endl;
     std::cout << "" << std::endl;
 }
 
