@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON) # ensure the C++ standard given before is ac
 set(CMAKE_CXX_EXTENSIONS OFF)       # avoid compile flags of the type -std=gnu++1z added by cmake
 
 include_directories(
+    EigenRand/
+
     mppi/mppi/
     corridor/
     ipddp/ipddp/

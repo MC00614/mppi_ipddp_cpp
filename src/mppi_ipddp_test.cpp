@@ -4,8 +4,6 @@
 #include "mppi_ipddp.h"
 #include "show.h"
 
-#include "log_mppi.h"
-
 int main() {
     // Model
     auto model = WMRobot();
@@ -50,33 +48,12 @@ int main() {
     mppi_ipddp.init(mppi_param, corridor_param, ipddp_param);
     mppi_ipddp.setCollisionChecker(&collision_checker);
 
-    // Log_MPPI
-    LogMPPI log_mppi(model);
-    log_mppi.init(mppi_param);
-    log_mppi.setCollisionChecker(&collision_checker);
-
-    clock_t start;
-    clock_t finish;
-    double mppi_ipddp_duration = 0.0;
-    double log_mppi_duration = 0.0;
-
     for (int t = 0; t < 1000; ++t) {
-        // MPPI_IPDDP
         mppi_ipddp.solve(1);
-        mppi_ipddp_duration = mppi_ipddp.mppi_duration + mppi_ipddp.corridor_duration + mppi_ipddp.ipddp_duration;
-        
-        // Log_MPPI
-        start = clock();
-        log_mppi.solve();
-        finish = clock();
-        log_mppi_duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-        std::cout << "Iteration : " << t << std::endl;
-        std::cout << "MPPI-IPDDP : " << mppi_ipddp_duration << " Seconds" << std::endl;
-        std::cout << "LOG-MPPI : " << log_mppi_duration << " Seconds" << std::endl;
-        std::cout << "" << std::endl;
+        show2D(mppi_ipddp.mppi_X, mppi_ipddp.mppi_U, mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
 
-        show2D(log_mppi.getResX(), log_mppi.getResU(), mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
+        // mppi_ipddp.move();
     }
 
     return 0;

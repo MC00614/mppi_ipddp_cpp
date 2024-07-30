@@ -122,11 +122,11 @@ void Corridor::hz(const Eigen::MatrixXd &X) {
         else if (r_max < radius) {radius = r_max;}
         Z(center_point, j) = radius;
 
-        distance_vector = Z.topRows(center_point).col(j) - X.topRows(center_point).col(j);
-        distance = distance_vector.norm();
-        if (radius < distance) {
-            Z.topRows(center_point).col(j) = X.topRows(center_point).col(j) + radius/distance * distance_vector;
-        }
+        // distance_vector = Z.topRows(center_point).col(j) - X.topRows(center_point).col(j);
+        // distance = distance_vector.norm();
+        // if (radius < distance) {
+        //     Z.topRows(center_point).col(j) = X.topRows(center_point).col(j) + radius/distance * distance_vector;
+        // }
     }
 };
 

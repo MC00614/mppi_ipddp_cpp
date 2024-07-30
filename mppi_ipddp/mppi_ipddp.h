@@ -22,6 +22,9 @@ public:
     // TEMP
     Eigen::MatrixXd mppi_X;
     Eigen::MatrixXd mppi_U;
+    double mppi_duration;
+    double corridor_duration;
+    double ipddp_duration;
 
 private:
     MPPI mppi;
@@ -69,9 +72,9 @@ void MPPI_IPDDP::setCollisionChecker(CollisionChecker *collision_checker) {
 void MPPI_IPDDP::solve(int iter) {
     clock_t start;
     clock_t finish;
-    double mppi_duration = 0.0;
-    double corridor_duration = 0.0;
-    double ipddp_duration = 0.0;
+    mppi_duration = 0.0;
+    corridor_duration = 0.0;
+    ipddp_duration = 0.0;
 
     for (int i = 0; i < iter; ++i) {
         start = clock();
@@ -80,9 +83,10 @@ void MPPI_IPDDP::solve(int iter) {
         finish = clock();
         mppi_duration += (double)(finish - start) / CLOCKS_PER_SEC;
 
-        // TEMP
+        // TEMP //
         mppi_X = X;
         mppi_U = U;
+        // TEMP //
 
         start = clock();
         // std::cout<<"corridor"<<std::endl;
@@ -96,11 +100,11 @@ void MPPI_IPDDP::solve(int iter) {
         finish = clock();
         ipddp_duration += (double)(finish - start) / CLOCKS_PER_SEC;
     }
-    std::cout << "MPPI : " << mppi_duration << " Seconds" << std::endl;
-    std::cout << "CORRIDOR : " << corridor_duration << " Seconds" << std::endl;
-    std::cout << "IPDDP : " << ipddp_duration << " Seconds" << std::endl;
-    std::cout << "Total : " << mppi_duration+corridor_duration+ipddp_duration << " Seconds" << std::endl;
-    std::cout << "" << std::endl;
+    // std::cout << "MPPI : " << mppi_duration << " Seconds" << std::endl;
+    // std::cout << "CORRIDOR : " << corridor_duration << " Seconds" << std::endl;
+    // std::cout << "IPDDP : " << ipddp_duration << " Seconds" << std::endl;
+    // std::cout << "Total : " << mppi_duration+corridor_duration+ipddp_duration << " Seconds" << std::endl;
+    // std::cout << "" << std::endl;
 }
 
 void MPPI_IPDDP::move() {

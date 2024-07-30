@@ -65,7 +65,7 @@ WMRobot::WMRobot() {
         c_n(1) = - u(0);
         c_n(2) = u(1) - 1.5;
         c_n(3) = - u(1) - 1.5;
-        c_n(consts) = (x.topRows(center_point) - C).squaredNorm() - (R*R);
+        c_n(consts) = (x.topRows(center_point) - C).norm() - (R);
         return c_n;
     };
 

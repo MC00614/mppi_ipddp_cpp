@@ -1,5 +1,7 @@
-/.vscode
-/build
-/eigen
-/matplotlibcpp
-/autodiff
+.vscode/
+build/
+eigen/
+matplotlibcpp/
+autodiff/
+
+EigenRand/
