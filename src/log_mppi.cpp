@@ -5,7 +5,6 @@
 #include "show.h"
 
 #include "log_mppi.h"
-#include "smooth_mppi.h"
 
 int main() {
     // Model
@@ -16,6 +15,7 @@ int main() {
     mppi_param.Nu = 5000;
     mppi_param.gamma_u = 100.0;
     Eigen::VectorXd sigma_u(model.dim_u);
+    // CHECK!
     sigma_u << 0.5, 0.5;
     mppi_param.sigma_u = sigma_u.asDiagonal();
     
@@ -27,7 +27,7 @@ int main() {
     Eigen::VectorXd sigma_z(model.center_point + 1);
     sigma_z << 0.3, 0.3, 0.08;
     corridor_param.sigma_z = sigma_z.asDiagonal();
-    corridor_param.lambda_c = 35.0;
+    corridor_param.lambda_c = 40.0;
     corridor_param.lambda_r = 35.0;
     corridor_param.r_max = 0.5;
 
@@ -55,29 +55,10 @@ int main() {
     log_mppi.init(mppi_param);
     log_mppi.setCollisionChecker(&collision_checker);
 
-    // Smooth_MPPI
-    SmoothMPPI smooth_mppi(model);
-    MPPIParam smooth_mppi_param1;
-    smooth_mppi_param1.Nu = 5000;
-    smooth_mppi_param1.gamma_u = 10.0;
-    Eigen::VectorXd sigma_u_1(model.dim_u);
-    sigma_u_1 << 0.5, 0.5;
-    smooth_mppi_param1.sigma_u = sigma_u_1.asDiagonal();
-    SmoothMPPIParam smooth_mppi_param2;
-    smooth_mppi_param2.dt = 1.0;
-    smooth_mppi_param2.lambda = 15.0;
-    Eigen::VectorXd w(model.dim_u);
-    w << 0.8, 0.8;
-    smooth_mppi_param2.w = w.asDiagonal();
-
-    smooth_mppi.init2(smooth_mppi_param1, smooth_mppi_param2);
-    smooth_mppi.setCollisionChecker(&collision_checker);
-
     clock_t start;
     clock_t finish;
     double mppi_ipddp_duration = 0.0;
     double log_mppi_duration = 0.0;
-    double smooth_mppi_duration = 0.0;
 
     for (int t = 0; t < 1000; ++t) {
         // MPPI_IPDDP
@@ -90,21 +71,12 @@ int main() {
         finish = clock();
         log_mppi_duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-        start = clock();
-        smooth_mppi.solve();
-        finish = clock();
-        smooth_mppi_duration = (double)(finish - start) / CLOCKS_PER_SEC;
-
         std::cout << "Iteration : " << t << std::endl;
-        std::cout << "MPPI-IPDDP : " << mppi_ipddp_duration << " Seconds\t";
-        std::cout << mppi_ipddp.mppi_duration << '\t' << mppi_ipddp.corridor_duration << '\t' << mppi_ipddp.ipddp_duration << std::endl;
+        std::cout << "MPPI-IPDDP : " << mppi_ipddp_duration << " Seconds" << std::endl;
         std::cout << "LOG-MPPI : " << log_mppi_duration << " Seconds" << std::endl;
-        std::cout << "SMOOTH-MPPI : " << smooth_mppi_duration << " Seconds" << std::endl;
         std::cout << "" << std::endl;
 
-        // show2D(log_mppi.getResX(), log_mppi.getResU(), mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
-        show2D(smooth_mppi.getResX(), smooth_mppi.getResU(), mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
-        // show2D(log_mppi.getResX(), log_mppi.getResU(), smooth_mppi.getResX(), smooth_mppi.getResU(), mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
+        show2D(log_mppi.getResX(), log_mppi.getResU(), mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
     }
 
     return 0;

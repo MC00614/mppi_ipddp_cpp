@@ -3,5 +3,4 @@ build/
 eigen/
 matplotlibcpp/
 autodiff/
-
 EigenRand/
