@@ -69,14 +69,14 @@ WMRobot::WMRobot() {
         return c_n;
     };
 
-    h = [this](Eigen::MatrixXd U) -> Eigen::MatrixXd{
+    h = [&](Eigen::Ref<Eigen::MatrixXd> U) -> void {
         for (int i = 0; i < N; ++i) {
             if (U.col(i)(0) < 0.0) {U.col(i)(0) = 0.0;}
             else if (1.5 < U.col(i)(0)) {U.col(i)(0) = 1.5;}
             if (U.col(i)(1) < -1.5) {U.col(i)(1) = -1.5;}
             else if (1.5 < U.col(i)(1)) {U.col(i)(1) = 1.5;}
         }
-        return U;
+        return;
     };
 }
 

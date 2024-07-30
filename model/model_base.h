@@ -33,7 +33,7 @@ public:
     // Constraint
     std::function<VectorXdual2nd(VectorXdual2nd, VectorXdual2nd, VectorXdual2nd, dual2nd)> c;
 
-    std::function<Eigen::MatrixXd(Eigen::MatrixXd)> h;
+    std::function<void(Eigen::Ref<Eigen::MatrixXd>)> h;
 };
 
 ModelBase::ModelBase() {
