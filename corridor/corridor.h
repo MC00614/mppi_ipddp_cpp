@@ -2,6 +2,8 @@
 #include "model_base.h"
 #include "collision_checker.h"
 
+#include <EigenRand/EigenRand>
+
 #include <iostream>
 
 class Corridor {
@@ -11,7 +13,6 @@ public:
     void init(CorridorParam corridor_param);
     void setCollisionChecker(CollisionChecker *collision_checker);
     void solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::VectorXd &R);
-    // void hz(int i, const Eigen::MatrixXd &X);
     void hz(const Eigen::MatrixXd &X);
 
     Eigen::MatrixXd getResC();
@@ -28,6 +29,9 @@ private:
     double r_max;
     CollisionChecker *collision_checker;
     int center_point;
+
+    std::mt19937_64 urng{ 42 };
+    Eigen::Rand::NormalGen<double> norm_gen{0.0, 1.0};
 
     Eigen::MatrixXd Z;
     Eigen::MatrixXd Zi;
@@ -72,7 +76,7 @@ void Corridor::solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::Vector
 
     for (int iter = 0; iter < max_iter; ++iter) {
         for (int t = 0; t < N; ++t) {
-            Zi = Z.col(t).replicate(1, Nz) + (this->sigma_z * Eigen::MatrixXd::Random(center_point + 1, Nz));
+            Zi = Z.col(t).replicate(1, Nz) + (this->sigma_z * norm_gen.template generate<Eigen::MatrixXd>(center_point + 1, Nz, urng));
             costs = lambda_c * (Zi.topRows(center_point).colwise() - X.col(t).topRows(center_point)).colwise().norm();
             costs -= lambda_r * Zi.bottomRows(1).transpose();
             for (int i = 0; i < Nz; ++i) {
@@ -91,25 +95,6 @@ void Corridor::solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::Vector
     C = Z.topRows(center_point);
     R = Z.bottomRows(1).transpose();
 }
-
-// void Corridor::hz(int i, const Eigen::MatrixXd &X) {
-//     double radius;
-//     Eigen::MatrixXd distance_vector;
-//     double distance;
-//     for (int j = 0; j < N; ++j) {
-//         radius = Zi(i * (center_point + 1) + center_point, j);
-//         if (radius < -r_max) {radius = r_max;}
-//         else if (radius < 0.0) {radius = -radius;}
-//         else if (r_max < radius) {radius = r_max;}
-//         Zi(i * (center_point + 1) + center_point, j) = radius;
-        
-//         distance_vector = Zi.col(j).middleRows(i * (center_point + 1), center_point) - X.topRows(center_point).col(j);
-//         distance = distance_vector.norm();
-//         if (radius < distance) {
-//             Zi.col(j).middleRows(i * (center_point + 1), center_point) = X.topRows(center_point).col(j) + radius/distance * distance_vector;
-//         }
-//     }
-// };
 
 void Corridor::hz(const Eigen::MatrixXd &X) {
     double radius;

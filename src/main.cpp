@@ -27,7 +27,7 @@ int main() {
     Eigen::VectorXd sigma_z(model.center_point + 1);
     sigma_z << 0.3, 0.3, 0.08;
     corridor_param.sigma_z = sigma_z.asDiagonal();
-    corridor_param.lambda_c = 20.0;
+    corridor_param.lambda_c = 40.0;
     corridor_param.lambda_r = 35.0;
     corridor_param.r_max = 0.5;
 
