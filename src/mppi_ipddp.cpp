@@ -3,6 +3,7 @@
 #include "collision_checker.h"
 #include "mppi_ipddp.h"
 #include "show.h"
+#include "parameter.h"
 
 #include "log_mppi.h"
 #include "smooth_mppi.h"
@@ -24,14 +25,23 @@ int main() {
 
     Eigen::VectorXd final_state(model.dim_x);
     final_state << 0.0, 6.0, M_PI_2;
-    Eigen::MatrixXd res_X;
+    Eigen::MatrixXd res_X, res_U;
     int max_iter = 100;
     double total_duration = 0.0;
+    bool is_failed;
+    int fail = 0;
+    int sim_maxiter = 100;
 
-    for (int t = 0; t < 10; ++t) {
+    double mean_squared_curvature_x = 0.0;
+    double mean_squared_curvature_u = 0.0;
+    double total_variation_x = 0.0;
+    double total_variation_u = 0.0;
+
+    for (int t = 0; t < sim_maxiter; ++t) {
+        is_failed = false;
         // MPPI Parameter
         MPPIParam mppi_param;
-        mppi_param.Nu = 300;
+        mppi_param.Nu = 500;
         mppi_param.gamma_u = 100.0;
         Eigen::VectorXd sigma_u(model.dim_u);
         sigma_u << 0.5, 0.5;
@@ -39,11 +49,11 @@ int main() {
         
         // Corridor Parameter
         CorridorParam corridor_param;
-        corridor_param.max_iter = 5;
-        corridor_param.Nz = 200;
+        corridor_param.max_iter = 3;
+        corridor_param.Nz = 1000;
         corridor_param.gamma_z = 1000.0;
         Eigen::VectorXd sigma_z(model.center_point + 1);
-        sigma_z << 0.3, 0.3, 0.08;
+        sigma_z << 0.3, 0.3, 0.1;
         corridor_param.sigma_z = sigma_z.asDiagonal();
         corridor_param.lambda_c = 35.0;
         corridor_param.lambda_r = 35.0;
@@ -75,7 +85,8 @@ int main() {
             mppi_ipddp_duration3 += mppi_ipddp.ipddp_duration;
 
             res_X = mppi_ipddp.X;
-            if ((final_state - res_X.col(model.N)).norm() < 0.15) {
+            res_U = mppi_ipddp.U;
+            if ((final_state - res_X.col(model.N)).norm() < 0.1) {
                 bool is_collision = false;
                 for (int j = 0; j < model.N; ++j) {
                     if (collision_checker.getCollisionGrid(res_X.col(j))) {
@@ -86,21 +97,34 @@ int main() {
                 if (!is_collision) {
                     break;
                 }
-                break;
             }
-            if (i + 1 == max_iter) {std::cout << "FAIL" << std::endl;}
-            
+            if (i + 1 == max_iter) {
+                is_failed = true;
+                std::cout<<"FAILED"<<std::endl;
+            }
         }
-        show2D(mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
-        mppi_ipddp_duration = mppi_ipddp_duration1 + mppi_ipddp_duration2 + mppi_ipddp_duration3;
-        total_duration += mppi_ipddp_duration;
+        if (!is_failed) {
+            mppi_ipddp_duration = mppi_ipddp_duration1 + mppi_ipddp_duration2 + mppi_ipddp_duration3;
+            total_duration += mppi_ipddp_duration;
+            mean_squared_curvature_x += meanSquaredCurvature(res_X);
+            mean_squared_curvature_u += meanSquaredCurvature(res_U);
+            total_variation_x += totalVariation(res_X);
+            total_variation_u += totalVariation(res_U);
+        }
+        else {fail++;}
+        
         std::cout << "\nMPPI-IPDDP : " << mppi_ipddp_duration << " Seconds / " << i << " Iteration" << std::endl;
         std::cout << mppi_ipddp_duration1 << '\t' << mppi_ipddp_duration2 << '\t' << mppi_ipddp_duration3 << std::endl;
-
         std::cout << "Final Error : " << (final_state - res_X.col(model.N)).norm() << std::endl;
     }
-    std::cout << "Total : " << total_duration << " Seconds" << std::endl;
-
+    std::cout << "" << std::endl;
+    std::cout << "Total " << sim_maxiter << "Simulation" << std::endl;
+    std::cout << "Success Rate : " << ((sim_maxiter - fail)/(float)sim_maxiter)*100.0 << "% (Fail : " << fail << ")" << std::endl;
+    std::cout << "Mean Squared Curvature X : " << mean_squared_curvature_x << std::endl;
+    std::cout << "Mean Squared Curvature U : " << mean_squared_curvature_u << std::endl;
+    std::cout << "Total Variation X : " << total_variation_x << std::endl;
+    std::cout << "Total Variation U : " << total_variation_u << std::endl;
+    std::cout << "Average : " << total_duration/(sim_maxiter-fail) << " Seconds ( Total " << total_duration << ")" << std::endl;
 
     return 0;
 }

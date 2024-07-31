@@ -90,7 +90,7 @@ int main() {
     int t = 0;
     Eigen::VectorXd final_state(model.dim_x);
     final_state << 0.0, 6.0, M_PI_2;
-    Eigen::MatrixXd res_X;
+    Eigen::MatrixXd res_X, res_U;
     for (t = 0; t < 1000; ++t) {
         // MPPI_IPDDP
         mppi_ipddp.solve(1);

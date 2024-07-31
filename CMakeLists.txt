@@ -24,15 +24,15 @@ include_directories(
     ${PYTHON_INCLUDE_DIRS}
 )
 
-add_executable(main
-    src/main.cpp
-)
-target_compile_options(main PRIVATE -O3)
+# add_executable(main
+#     src/main.cpp
+# )
+# target_compile_options(main PRIVATE -O3)
 
-target_link_libraries(main
-    ${PYTHON_LIBRARIES}
-    OpenMP::OpenMP_CXX
-)
+# target_link_libraries(main
+#     ${PYTHON_LIBRARIES}
+#     OpenMP::OpenMP_CXX
+# )
 
 # Log_MPPI
 add_executable(log_mppi
