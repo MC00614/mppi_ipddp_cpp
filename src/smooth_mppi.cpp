@@ -32,11 +32,18 @@ int main() {
     int fail = 0;
     int sim_maxiter = 100;
 
-    double mean_squared_curvature_x = 0.0;
-    double mean_squared_curvature_u = 0.0;
-    double total_variation_x = 0.0;
-    double total_variation_u = 0.0;
+    double total_msc_x = 0.0;
+    double total_msc_u = 0.0;
+    double total_tv_x = 0.0;
+    double total_tv_u = 0.0;
+    double msc_x = 0.0;
+    double msc_u = 0.0;
+    double tv_x = 0.0;
+    double tv_u = 0.0;
 
+    std::cout << "Smooth-MPPI (" << sim_maxiter << " simulations)" << std::endl;
+    std::cout << "iter_duration\titer\tfinal_error\tfailed\tmsc_x\t\tmsc_u\t\ttv_x\t\ttv_u" << std::endl;
+    
     for (int t = 0; t < sim_maxiter; ++t) {
         is_failed = false;
         // Smooth_MPPI
@@ -84,29 +91,35 @@ int main() {
             }
             if (i + 1 == max_iter) {
                 is_failed = true;
-                std::cout<<"FAILED"<<std::endl;
             }
         }
         if (!is_failed) {
             total_duration += smooth_mppi_duration;
-            mean_squared_curvature_x += meanSquaredCurvature(res_X);
-            mean_squared_curvature_u += meanSquaredCurvature(res_U);
-            total_variation_x += totalVariation(res_X);
-            total_variation_u += totalVariation(res_U);
+            msc_x = meanSquaredCurvature(res_X);
+            msc_u = meanSquaredCurvature(res_U);
+            tv_x = totalVariation(res_X);
+            tv_u = totalVariation(res_U);
         }
         else {fail++;}
-        
-        std::cout << "\nSmooth-MPPI : " << smooth_mppi_duration << " Seconds / " << i << " Iteration" << std::endl;
-        std::cout << "Final Error : " << (final_state - res_X.col(model.N)).norm() << std::endl;
+        double fs_error = (final_state - res_X.col(model.N)).norm();
+        total_msc_x += msc_x;
+        total_msc_u += msc_u;
+        total_tv_x += tv_x;
+        total_tv_u += tv_u;
+        std::cout.fill('0');
+        std::cout.width(8);
+        std::cout<<smooth_mppi_duration<<'\t'<<i<<'\t'<<fs_error<<'\t'<<(int)is_failed<<"\t";
+        std::cout.fill('0');
+        std::cout.width(8);
+        std::cout<<msc_x<<'\t'<<msc_u<<'\t'<<tv_x<<'\t'<<tv_u<<std::endl;
     }
     std::cout << "" << std::endl;
-    std::cout << "Total " << sim_maxiter << "Simulation" << std::endl;
-    std::cout << "Success Rate : " << ((sim_maxiter - fail)/(float)sim_maxiter)*100.0 << "% (Fail : " << fail << ")" << std::endl;
-    std::cout << "Mean Squared Curvature X : " << mean_squared_curvature_x << std::endl;
-    std::cout << "Mean Squared Curvature U : " << mean_squared_curvature_u << std::endl;
-    std::cout << "Total Variation X : " << total_variation_x << std::endl;
-    std::cout << "Total Variation U : " << total_variation_u << std::endl;
-    std::cout << "Average : " << total_duration/(sim_maxiter-fail) << " Seconds ( Total " << total_duration << ")" << std::endl;
+    std::cout << "Success Rate : " << (int)(((sim_maxiter - fail)/(float)sim_maxiter)*100.0) << "% (Fail : " << fail << ")" << std::endl;
+    std::cout << "Mean Squared Curvature X : " << total_msc_x << std::endl;
+    std::cout << "Mean Squared Curvature U : " << total_msc_u << std::endl;
+    std::cout << "Total Variation X : " << total_tv_x << std::endl;
+    std::cout << "Total Variation U : " << total_tv_u << std::endl;
+    std::cout << "Average : " << total_duration/(sim_maxiter-fail) << " Seconds (Total " << total_duration << ")" << std::endl;
 
     return 0;
 }

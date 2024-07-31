@@ -1,5 +1,7 @@
 #include <Eigen/Dense>
 
+#include <iomanip>
+
 Eigen::MatrixXd firstDerivative(const Eigen::MatrixXd &matrix) {
     int rows = matrix.rows();
     int cols = matrix.cols();
