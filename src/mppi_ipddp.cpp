@@ -123,6 +123,7 @@ int main() {
         total_msc_u += msc_u;
         total_tv_x += tv_x;
         total_tv_u += tv_u;
+        std::cout << std::fixed << std::setprecision(6);
         std::cout.fill('0');
         std::cout.width(8);
         std::cout<<mppi_ipddp_duration<<'\t'<<i<<'\t'<<fs_error<<'\t'<<(int)is_failed<<"\t";
