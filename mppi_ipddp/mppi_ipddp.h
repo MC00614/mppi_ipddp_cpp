@@ -4,6 +4,8 @@
 
 #include "model_base.h"
 
+#include <chrono>
+
 class MPPI_IPDDP {
 public:
     MPPI_IPDDP(ModelBase model);
@@ -70,35 +72,40 @@ void MPPI_IPDDP::setCollisionChecker(CollisionChecker *collision_checker) {
 }
 
 void MPPI_IPDDP::solve(int iter) {
-    clock_t start;
-    clock_t finish;
     mppi_duration = 0.0;
     corridor_duration = 0.0;
     ipddp_duration = 0.0;
 
+    auto start = std::chrono::high_resolution_clock::now();
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed;
+
     for (int i = 0; i < iter; ++i) {
-        start = clock();
+        start = std::chrono::high_resolution_clock::now();
         // std::cout<<"mppi"<<std::endl;
         mppi.solve(X, U);
-        finish = clock();
-        mppi_duration += (double)(finish - start) / CLOCKS_PER_SEC;
+        finish = std::chrono::high_resolution_clock::now();
+        elapsed = finish - start;
+        mppi_duration += elapsed.count();
 
         // TEMP //
         mppi_X = X;
         mppi_U = U;
         // TEMP //
 
-        start = clock();
+        start = std::chrono::high_resolution_clock::now();
         // std::cout<<"corridor"<<std::endl;
         corridor.solve(X, C, R);
-        finish = clock();
-        corridor_duration += (double)(finish - start) / CLOCKS_PER_SEC;
+        finish = std::chrono::high_resolution_clock::now();
+        elapsed = finish - start;
+        corridor_duration += elapsed.count();
 
-        start = clock();
+        start = std::chrono::high_resolution_clock::now();
         // std::cout<<"ipddp"<<std::endl;
         ipddp.solve(X, U, C, R);
-        finish = clock();
-        ipddp_duration += (double)(finish - start) / CLOCKS_PER_SEC;
+        finish = std::chrono::high_resolution_clock::now();
+        elapsed = finish - start;
+        ipddp_duration += elapsed.count();
     }
     // std::cout << "MPPI : " << mppi_duration << " Seconds" << std::endl;
     // std::cout << "CORRIDOR : " << corridor_duration << " Seconds" << std::endl;

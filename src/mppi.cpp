@@ -4,7 +4,8 @@
 #include "mppi_ipddp.h"
 #include "show.h"
 
-#include "log_mppi.h"
+#include "mppi.h"
+#include "mppi.h"
 #include "smooth_mppi.h"
 
 #include <chrono>
@@ -30,27 +31,27 @@ int main() {
 
     for (int t = 0; t < 10; ++t) {
         // Log_MPPI
-        LogMPPI log_mppi(model);
-        MPPIParam log_mppi_param1;
-        log_mppi_param1.Nu = 5000;
-        log_mppi_param1.gamma_u = 10.0;
+        MPPI mppi(model);
+        MPPIParam mppi_param;
+        mppi_param.Nu = 5000;
+        mppi_param.gamma_u = 10.0;
         Eigen::VectorXd log_mppi_sigma_u(model.dim_u);
         log_mppi_sigma_u << 0.5, 0.5;
-        log_mppi_param1.sigma_u = log_mppi_sigma_u.asDiagonal();
-        log_mppi.init(log_mppi_param1);
-        log_mppi.setCollisionChecker(&collision_checker);
+        mppi_param.sigma_u = log_mppi_sigma_u.asDiagonal();
+        mppi.init(mppi_param);
+        mppi.setCollisionChecker(&collision_checker);
         
-        double log_mppi_duration = 0.0;
+        double mppi_duration = 0.0;
         int i;
         for (i = 0; i < max_iter; ++i) {
-            // Log_MPPI
+            // MPPI
             auto start = std::chrono::high_resolution_clock::now();
-            log_mppi.solve();
+            mppi.solve();
             auto finish = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> elapsed = finish - start;
-            log_mppi_duration += elapsed.count();
+            mppi_duration += elapsed.count();
 
-            res_X = log_mppi.getResX();
+            res_X = mppi.getResX();
             if ((final_state - res_X.col(model.N)).norm() < 0.15) {
                 bool is_collision = false;
                 for (int j = 0; j < model.N; ++j) {
@@ -66,8 +67,8 @@ int main() {
             }
             if (i + 1 == max_iter) {std::cout << "FAIL" << std::endl;}
         }
-        total_duration += log_mppi_duration;
-        std::cout << "\nLOG-MPPI : " << log_mppi_duration << " Seconds / " << i << " Iteration" << std::endl;
+        total_duration += mppi_duration;
+        std::cout << "\nMPPI : " << mppi_duration << " Seconds / " << i << " Iteration" << std::endl;
         std::cout << "Final Error : " << (final_state - res_X.col(model.N)).norm() << std::endl;
     }
     std::cout << "Total : " << total_duration << " Seconds" << std::endl;

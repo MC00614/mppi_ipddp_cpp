@@ -4,7 +4,10 @@
 
 #include <EigenRand/EigenRand>
 
+#include <ctime>
 #include <iostream>
+
+#include <omp.h>
 
 class Corridor {
 public:
@@ -13,7 +16,7 @@ public:
     void init(CorridorParam corridor_param);
     void setCollisionChecker(CollisionChecker *collision_checker);
     void solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::VectorXd &R);
-    void hz(const Eigen::MatrixXd &X);
+    void hz(Eigen::MatrixXd &Z);
 
     Eigen::MatrixXd getResC();
     Eigen::VectorXd getResR();
@@ -30,13 +33,11 @@ private:
     CollisionChecker *collision_checker;
     int center_point;
 
-    std::mt19937_64 urng{ 42 };
+    std::mt19937_64 urng{static_cast<std::uint_fast64_t>(std::time(nullptr))};
+    // std::mt19937_64 urng{1};
     Eigen::Rand::NormalGen<double> norm_gen{0.0, 1.0};
 
     Eigen::MatrixXd Z;
-    Eigen::MatrixXd Zi;
-    Eigen::VectorXd costs;
-    Eigen::VectorXd weights;
 };
 
 Corridor::Corridor(ModelBase model) {
@@ -56,9 +57,6 @@ void Corridor::init(CorridorParam corridor_param) {
     this->lambda_r = corridor_param.lambda_r;
     this->r_max = corridor_param.r_max;
     Z.resize(center_point + 1, N);
-    Zi.resize(center_point + 1, Nz);
-    costs.resize(Nz);
-    weights.resize(Nz);
 }
 
 void Corridor::setCollisionChecker(CollisionChecker *collision_checker) {
@@ -66,17 +64,15 @@ void Corridor::setCollisionChecker(CollisionChecker *collision_checker) {
 }
 
 void Corridor::solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::VectorXd &R) {
-    double distance;
-    double cost;
-    double min_cost;
-    double total_weight;
-
     Z.topRows(center_point) = X.topRows(center_point).leftCols(N);
     Z.bottomRows(1) = Eigen::MatrixXd::Zero(1, N);
 
     for (int iter = 0; iter < max_iter; ++iter) {
+        #pragma omp parallel for
         for (int t = 0; t < N; ++t) {
+            Eigen::MatrixXd Zi(center_point + 1, Nz);
             Zi = Z.col(t).replicate(1, Nz) + (this->sigma_z * norm_gen.template generate<Eigen::MatrixXd>(center_point + 1, Nz, urng));
+            Eigen::VectorXd costs(Nz);
             costs = lambda_c * (Zi.topRows(center_point).colwise() - X.col(t).topRows(center_point)).colwise().norm();
             costs -= lambda_r * Zi.bottomRows(1).transpose();
             for (int i = 0; i < Nz; ++i) {
@@ -84,19 +80,21 @@ void Corridor::solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::Vector
                     costs(i) = 1e8;
                 }
             }
-            min_cost = costs.minCoeff();
+            double min_cost = costs.minCoeff();
+            
+            Eigen::VectorXd weights;
             weights = (-gamma_z * (costs.array() - min_cost)).exp();
-            total_weight = weights.sum();
+            double total_weight = weights.sum();
             weights /= total_weight;
             Z.col(t) = Zi * weights;
         }
-        hz(X);
+        hz(Z);
     }
     C = Z.topRows(center_point);
     R = Z.bottomRows(1).transpose();
 }
 
-void Corridor::hz(const Eigen::MatrixXd &X) {
+void Corridor::hz(Eigen::MatrixXd &Z) {
     double radius;
     Eigen::MatrixXd distance_vector;
     double distance;

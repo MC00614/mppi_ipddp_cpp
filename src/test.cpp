@@ -7,8 +7,6 @@
 #include "log_mppi.h"
 #include "smooth_mppi.h"
 
-#include <chrono>
-
 int main() {
     // Model
     auto model = WMRobot();
@@ -92,73 +90,59 @@ int main() {
     final_state << 0.0, 6.0, M_PI_2;
     Eigen::MatrixXd res_X;
     for (t = 0; t < 1000; ++t) {
-        // MPPI_IPDDP
-        mppi_ipddp.solve(1);
-        mppi_ipddp_duration += mppi_ipddp.mppi_duration + mppi_ipddp.corridor_duration + mppi_ipddp.ipddp_duration;
+        // // MPPI_IPDDP
+        // mppi_ipddp.solve(1);
+        // mppi_ipddp_duration += mppi_ipddp.mppi_duration + mppi_ipddp.corridor_duration + mppi_ipddp.ipddp_duration;
 
-        if ((final_state - mppi_ipddp.X.col(model.N)).norm() < 0.1) {
-            std::cout<<(final_state - mppi_ipddp.X.col(model.N)).norm()<<std::endl;
-            break;
-        }
+        // if ((final_state - mppi_ipddp.X.col(model.N)).norm() < 0.1) {
+        //     std::cout<<(final_state - mppi_ipddp.X.col(model.N)).norm()<<std::endl;
+        //     break;
+        // }
         
         // // Log_MPPI
-        // auto start = std::chrono::high_resolution_clock::now();
-        // log_mppi.solve();
-        // auto finish = std::chrono::high_resolution_clock::now();
-        // std::chrono::duration<double> elapsed = finish - start;
-        // log_mppi_duration += elapsed.count();
-
-        // res_X = log_mppi.getResX();
-        // if ((final_state - res_X.col(model.N)).norm() < 0.3) {
-        //     bool is_collision = false;
-        //     for (int j = 0; j < model.N; ++j) {
-        //         if (collision_checker.getCollisionGrid(res_X.col(j))) {
-        //             is_collision = true;
-        //             break;
-        //         }
-        //     }
-        //     if (!is_collision) {
-        //         break;
-        //     }
-        //     break;
-        // }
-        // else {continue;}
-
         // start = clock();
-        // smooth_mppi.solve();
+        // log_mppi.solve();
         // finish = clock();
-        // smooth_mppi_duration += (double)(finish - start) / CLOCKS_PER_SEC;
-        // res_X = smooth_mppi.getResX();
+        // log_mppi_duration += (double)(finish - start) / CLOCKS_PER_SEC;
 
-        // if ((final_state - res_X.col(model.N)).norm() < 0.1) {
-        //     bool is_collision = false;
-        //     for (int j = 0; j < model.N; ++j) {
-        //         if (collision_checker.getCollisionGrid(res_X.col(j))) {
-        //             is_collision = true;
-        //             break;
-        //         }
-        //     }
-        //     if (!is_collision) {
-        //         break;
-        //     }
+        // if ((final_state - log_mppi.getResX().col(model.N)).norm() < 0.1) {
+        //     std::cout<<(final_state - log_mppi.getResX().col(model.N)).norm()<<std::endl;
         //     break;
         // }
-        // else {continue;}
+
+        start = clock();
+        smooth_mppi.solve();
+        finish = clock();
+        smooth_mppi_duration += (double)(finish - start) / CLOCKS_PER_SEC;
+        res_X = smooth_mppi.getResX();
+
+        if ((final_state - res_X.col(model.N)).norm() < 0.1) {
+            bool is_collision = false;
+            for (int j = 0; j < model.N; ++j) {
+                if (collision_checker.getCollisionGrid(res_X.col(j))) {
+                    is_collision = true;
+                    break;
+                }
+            }
+            if (!is_collision) {
+                break;
+            }
+        }
+        else {continue;}
 
         
         // std::cout << mppi_ipddp.mppi_duration << '\t' << mppi_ipddp.corridor_duration << '\t' << mppi_ipddp.ipddp_duration << std::endl;
+        // std::cout << "LOG-MPPI : " << log_mppi_duration << " Seconds" << std::endl;
         // std::cout << "" << std::endl;
 
         // show2D(log_mppi.getResX(), log_mppi.getResU(), smooth_mppi.getResX(), smooth_mppi.getResU(), mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
     }
     std::cout << " Iteration : " << t << std::endl;
-    std::cout << "MPPI-IPDDP : " << mppi_ipddp_duration << " Seconds" << std::endl;
-    // std::cout << "SMOOTH-MPPI : " << smooth_mppi_duration << " Seconds" << std::endl;
-    // std::cout << "LOG-MPPI : " << log_mppi_duration << " Seconds" << std::endl;
+    // std::cout << "MPPI-IPDDP : " << mppi_ipddp_duration << " Seconds" << std::endl;
+    std::cout << "SMOOTH-MPPI : " << smooth_mppi_duration << " Seconds" << std::endl;
+    std::cout<<"Final Error : "<<(final_state - res_X.col(model.N)).norm()<<std::endl;
 
-    // std::cout<<"Final Error : "<<(final_state - res_X.col(model.N)).norm()<<std::endl;
-
-    // show2D(smooth_mppi.getResX(), smooth_mppi.getResU(), mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
+    show2D(smooth_mppi.getResX(), smooth_mppi.getResU(), mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
     // show2D(log_mppi.getResX(), log_mppi.getResU(), mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
 
     return 0;

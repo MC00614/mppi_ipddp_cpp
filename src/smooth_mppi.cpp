@@ -29,28 +29,35 @@ int main() {
     double total_duration = 0.0;
 
     for (int t = 0; t < 10; ++t) {
-        // Log_MPPI
-        LogMPPI log_mppi(model);
-        MPPIParam log_mppi_param1;
-        log_mppi_param1.Nu = 5000;
-        log_mppi_param1.gamma_u = 10.0;
-        Eigen::VectorXd log_mppi_sigma_u(model.dim_u);
-        log_mppi_sigma_u << 0.5, 0.5;
-        log_mppi_param1.sigma_u = log_mppi_sigma_u.asDiagonal();
-        log_mppi.init(log_mppi_param1);
-        log_mppi.setCollisionChecker(&collision_checker);
+        // Smooth_MPPI
+        SmoothMPPI smooth_mppi(model);
+        MPPIParam smooth_mppi_param1;
+        smooth_mppi_param1.Nu = 30000;
+        smooth_mppi_param1.gamma_u = 10.0;
+        Eigen::VectorXd sigma_u_1(model.dim_u);
+        sigma_u_1 << 0.5, 0.5;
+        smooth_mppi_param1.sigma_u = sigma_u_1.asDiagonal();
+        SmoothMPPIParam smooth_mppi_param2;
+        smooth_mppi_param2.dt = 1.0;
+        smooth_mppi_param2.lambda = 15.0;
+        Eigen::VectorXd w(model.dim_u);
+        w << 0.8, 0.8;
+        smooth_mppi_param2.w = w.asDiagonal();
+
+        smooth_mppi.init2(smooth_mppi_param1, smooth_mppi_param2);
+        smooth_mppi.setCollisionChecker(&collision_checker);
         
-        double log_mppi_duration = 0.0;
+        double smooth_mppi_duration = 0.0;
         int i;
         for (i = 0; i < max_iter; ++i) {
-            // Log_MPPI
+            // Smooth_MPPI
             auto start = std::chrono::high_resolution_clock::now();
-            log_mppi.solve();
+            smooth_mppi.solve();
             auto finish = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> elapsed = finish - start;
-            log_mppi_duration += elapsed.count();
+            smooth_mppi_duration += elapsed.count();
 
-            res_X = log_mppi.getResX();
+            res_X = smooth_mppi.getResX();
             if ((final_state - res_X.col(model.N)).norm() < 0.15) {
                 bool is_collision = false;
                 for (int j = 0; j < model.N; ++j) {
@@ -66,12 +73,11 @@ int main() {
             }
             if (i + 1 == max_iter) {std::cout << "FAIL" << std::endl;}
         }
-        total_duration += log_mppi_duration;
-        std::cout << "\nLOG-MPPI : " << log_mppi_duration << " Seconds / " << i << " Iteration" << std::endl;
+        total_duration += smooth_mppi_duration;
+        std::cout << "\nSmooth-MPPI : " << smooth_mppi_duration << " Seconds / " << i << " Iteration" << std::endl;
         std::cout << "Final Error : " << (final_state - res_X.col(model.N)).norm() << std::endl;
     }
     std::cout << "Total : " << total_duration << " Seconds" << std::endl;
-
 
     return 0;
 }
