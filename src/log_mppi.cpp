@@ -49,10 +49,10 @@ int main() {
         // Log_MPPI
         LogMPPI log_mppi(model);
         MPPIParam log_mppi_param1;
-        log_mppi_param1.Nu = 5000;
+        log_mppi_param1.Nu = 300;
         log_mppi_param1.gamma_u = 100.0;
         Eigen::VectorXd log_mppi_sigma_u(model.dim_u);
-        log_mppi_sigma_u << 0.3, 0.3;
+        log_mppi_sigma_u << 0.1, 0.1;
         log_mppi_param1.sigma_u = log_mppi_sigma_u.asDiagonal();
         log_mppi.init(log_mppi_param1);
         log_mppi.setCollisionChecker(&collision_checker);

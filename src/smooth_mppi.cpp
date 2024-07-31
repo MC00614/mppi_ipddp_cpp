@@ -49,10 +49,10 @@ int main() {
         // Smooth_MPPI
         SmoothMPPI smooth_mppi(model);
         MPPIParam smooth_mppi_param1;
-        smooth_mppi_param1.Nu = 15000;
+        smooth_mppi_param1.Nu = 1000;
         smooth_mppi_param1.gamma_u = 10.0;
         Eigen::VectorXd sigma_u_1(model.dim_u);
-        sigma_u_1 << 0.2, 0.2;
+        sigma_u_1 << 0.3, 0.3;
         smooth_mppi_param1.sigma_u = sigma_u_1.asDiagonal();
         SmoothMPPIParam smooth_mppi_param2;
         smooth_mppi_param2.dt = 1.0;
@@ -115,7 +115,7 @@ int main() {
         std::cout<<msc_x<<'\t'<<msc_u<<'\t'<<tv_x<<'\t'<<tv_u<<std::endl;
     }
     std::cout << "" << std::endl;
-    std::cout << "Success Rate : " << (int)(((sim_maxiter - fail)/(float)sim_maxiter)*100.0) << "% (Fail : " << fail << ")" << std::endl;
+    std::cout << "Success Rate : " << (int)(((sim_maxiter - fail)/(float)sim_maxiter)*100.0) << "% (Fail : " << fail << "/" << sim_maxiter << ")" << std::endl;
     std::cout << "Mean Squared Curvature X : " << total_msc_x << std::endl;
     std::cout << "Mean Squared Curvature U : " << total_msc_u << std::endl;
     std::cout << "Total Variation X : " << total_tv_x << std::endl;

@@ -48,7 +48,7 @@ int main() {
         is_failed = false;
         // MPPI Parameter
         MPPIParam mppi_param;
-        mppi_param.Nu = 500;
+        mppi_param.Nu = 300;
         mppi_param.gamma_u = 100.0;
         Eigen::VectorXd sigma_u(model.dim_u);
         sigma_u << 0.5, 0.5;
@@ -132,7 +132,7 @@ int main() {
         std::cout<<msc_x<<'\t'<<msc_u<<'\t'<<tv_x<<'\t'<<tv_u<<std::endl;
     }
     std::cout << "" << std::endl;
-    std::cout << "Success Rate : " << (int)(((sim_maxiter - fail)/(float)sim_maxiter)*100.0) << "% (Fail : " << fail << ")" << std::endl;
+    std::cout << "Success Rate : " << (int)(((sim_maxiter - fail)/(float)sim_maxiter)*100.0) << "% (Fail : " << fail << "/" << sim_maxiter << ")" << std::endl;
     std::cout << "Mean Squared Curvature X : " << total_msc_x << std::endl;
     std::cout << "Mean Squared Curvature U : " << total_msc_u << std::endl;
     std::cout << "Total Variation X : " << total_tv_x << std::endl;
