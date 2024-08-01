@@ -1,45 +1,42 @@
 #include "wmrobot.h"
 
 #include "collision_checker.h"
-#include "mppi_ipddp.h"
 #include "show.h"
+#include "parameter.h"
 
+#include "mppi.h"
 #include "log_mppi.h"
 #include "smooth_mppi.h"
+#include "mppi_ipddp.h"
 
 #include <chrono>
 
-int main() {
+int main(int argc, char* argv[]) {
+    std::string target;
+
+    if (argc > 1) {
+        target = argv[1];
+    }
+
     // Model
     auto model = WMRobot();
 
-    // MPPI Parameter
+    // PARAMETERS // PARAMETERS // PARAMETERS // PARAMETERS //
+    // MPPI
     MPPIParam mppi_param;
-    mppi_param.Nu = 100;
-    mppi_param.gamma_u = 100.0;
-    Eigen::VectorXd sigma_u(model.dim_u);
-    sigma_u << 0.5, 0.5;
-    mppi_param.sigma_u = sigma_u.asDiagonal();
-    
-    // Corridor Parameter
-    CorridorParam corridor_param;
-    corridor_param.max_iter = 5;
-    corridor_param.Nz = 100;
-    corridor_param.gamma_z = 1000.0;
-    Eigen::VectorXd sigma_z(model.center_point + 1);
-    sigma_z << 0.3, 0.3, 0.08;
-    corridor_param.sigma_z = sigma_z.asDiagonal();
-    corridor_param.lambda_c = 35.0;
-    corridor_param.lambda_r = 35.0;
-    corridor_param.r_max = 0.5;
 
-    // IPDDP Parameter
+    // Log_MPPI
+    MPPIParam log_mppi_param;
+
+    // Smooth_MPPI
+    MPPIParam smooth_mppi_param1;
+    SmoothMPPIParam smooth_mppi_param2;
+
+    //MPPI_IPDDP
+    MPPIParam mi_mppi_param;
+    CorridorParam corridor_param;
     Param ipddp_param;
-    ipddp_param.tolerance = 1e-7;
-    ipddp_param.max_iter = 500;
-    ipddp_param.mu = 0.01;
-    ipddp_param.infeasible = true;
-    ipddp_param.q = 0.001;
+    // PARAMETERS // PARAMETERS // PARAMETERS // PARAMETERS //
 
     // Collision Checker
     CollisionChecker collision_checker;
@@ -47,119 +44,229 @@ int main() {
     collision_checker.addRectangle(1.0, 2.0, 3.0, 2.0);
     collision_checker.addCircle(0.5, 1.0, 0.25);
 
-    // MPPI_IPDDP
-    MPPI_IPDDP mppi_ipddp(model);
-    mppi_ipddp.init(mppi_param, corridor_param, ipddp_param);
-    mppi_ipddp.setCollisionChecker(&collision_checker);
-
-    // Log_MPPI
-    LogMPPI log_mppi(model);
-    MPPIParam log_mppi_param1;
-    log_mppi_param1.Nu = 5000;
-    log_mppi_param1.gamma_u = 10.0;
-    Eigen::VectorXd log_mppi_sigma_u(model.dim_u);
-    log_mppi_sigma_u << 0.5, 0.5;
-    log_mppi_param1.sigma_u = log_mppi_sigma_u.asDiagonal();
-    log_mppi.init(log_mppi_param1);
-    log_mppi.setCollisionChecker(&collision_checker);
-
-    // Smooth_MPPI
-    SmoothMPPI smooth_mppi(model);
-    MPPIParam smooth_mppi_param1;
-    smooth_mppi_param1.Nu = 30000;
-    smooth_mppi_param1.gamma_u = 10.0;
-    Eigen::VectorXd sigma_u_1(model.dim_u);
-    sigma_u_1 << 0.5, 0.5;
-    smooth_mppi_param1.sigma_u = sigma_u_1.asDiagonal();
-    SmoothMPPIParam smooth_mppi_param2;
-    smooth_mppi_param2.dt = 1.0;
-    smooth_mppi_param2.lambda = 15.0;
-    Eigen::VectorXd w(model.dim_u);
-    w << 0.8, 0.8;
-    smooth_mppi_param2.w = w.asDiagonal();
-
-    smooth_mppi.init2(smooth_mppi_param1, smooth_mppi_param2);
-    smooth_mppi.setCollisionChecker(&collision_checker);
-
     clock_t start;
     clock_t finish;
-    double mppi_ipddp_duration = 0.0;
-    double log_mppi_duration = 0.0;
-    double smooth_mppi_duration = 0.0;
 
-    int t = 0;
     Eigen::VectorXd final_state(model.dim_x);
     final_state << 0.0, 6.0, M_PI_2;
     Eigen::MatrixXd res_X, res_U;
-    for (t = 0; t < 1000; ++t) {
-        // MPPI_IPDDP
-        mppi_ipddp.solve(1);
-        mppi_ipddp_duration += mppi_ipddp.mppi_duration + mppi_ipddp.corridor_duration + mppi_ipddp.ipddp_duration;
+    int max_iter = 10000;
+    bool is_failed;
+    int sim_maxiter = 1;
 
-        if ((final_state - mppi_ipddp.X.col(model.N)).norm() < 0.1) {
-            std::cout<<(final_state - mppi_ipddp.X.col(model.N)).norm()<<std::endl;
-            break;
-        }
-        
-        // // Log_MPPI
-        // auto start = std::chrono::high_resolution_clock::now();
-        // log_mppi.solve();
-        // auto finish = std::chrono::high_resolution_clock::now();
-        // std::chrono::duration<double> elapsed = finish - start;
-        // log_mppi_duration += elapsed.count();
-
-        // res_X = log_mppi.getResX();
-        // if ((final_state - res_X.col(model.N)).norm() < 0.3) {
-        //     bool is_collision = false;
-        //     for (int j = 0; j < model.N; ++j) {
-        //         if (collision_checker.getCollisionGrid(res_X.col(j))) {
-        //             is_collision = true;
-        //             break;
-        //         }
-        //     }
-        //     if (!is_collision) {
-        //         break;
-        //     }
-        //     break;
-        // }
-        // else {continue;}
-
-        // start = clock();
-        // smooth_mppi.solve();
-        // finish = clock();
-        // smooth_mppi_duration += (double)(finish - start) / CLOCKS_PER_SEC;
-        // res_X = smooth_mppi.getResX();
-
-        // if ((final_state - res_X.col(model.N)).norm() < 0.1) {
-        //     bool is_collision = false;
-        //     for (int j = 0; j < model.N; ++j) {
-        //         if (collision_checker.getCollisionGrid(res_X.col(j))) {
-        //             is_collision = true;
-        //             break;
-        //         }
-        //     }
-        //     if (!is_collision) {
-        //         break;
-        //     }
-        //     break;
-        // }
-        // else {continue;}
-
-        
-        // std::cout << mppi_ipddp.mppi_duration << '\t' << mppi_ipddp.corridor_duration << '\t' << mppi_ipddp.ipddp_duration << std::endl;
-        // std::cout << "" << std::endl;
-
-        // show2D(log_mppi.getResX(), log_mppi.getResU(), smooth_mppi.getResX(), smooth_mppi.getResU(), mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
+    // 100 200 400 800 1600 3200 6400 12800 25600
+    std::vector<int> N;
+    for (int n = 0; n < 9; ++n) {
+        N.push_back(100 * std::pow(2, n));
     }
-    std::cout << " Iteration : " << t << std::endl;
-    std::cout << "MPPI-IPDDP : " << mppi_ipddp_duration << " Seconds" << std::endl;
-    // std::cout << "SMOOTH-MPPI : " << smooth_mppi_duration << " Seconds" << std::endl;
-    // std::cout << "LOG-MPPI : " << log_mppi_duration << " Seconds" << std::endl;
+    std::vector<double> SIGMA_U;
+    for (int n = 0; n < 9; ++n) {
+        SIGMA_U.push_back(0.1 + (0.1 * n));
+    }
 
-    // std::cout<<"Final Error : "<<(final_state - res_X.col(model.N)).norm()<<std::endl;
+    std::cout<<"Target = "<<target<<std::endl;
+    std::cout<<"Simulate "<<sim_maxiter<<" times for each"<<std::endl;
 
-    // show2D(smooth_mppi.getResX(), smooth_mppi.getResU(), mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
-    // show2D(log_mppi.getResX(), log_mppi.getResU(), mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
+    std::cout << "N\tS_u\tP\tF\tt_msc_x\tt_msc_u\tt_tv_x\t\tt_tv_u\t\tavg_time\ttotal_time" << std::endl;
+
+    for (int p1 = 0; p1 < N.size(); ++p1) {
+        for (int p2 = 0; p2 < SIGMA_U.size(); ++p2) {
+            // PARAMETERS // PARAMETERS // PARAMETERS // PARAMETERS //
+            if (target == "MPPI") {
+                mppi_param.Nu = N[p1];
+                mppi_param.gamma_u = 100.0;
+                mppi_param.sigma_u = SIGMA_U[p2] * Eigen::MatrixXd::Identity(model.dim_u, model.dim_u);
+                // Eigen::VectorXd mppi_sigma_u(model.dim_u);
+                // mppi_sigma_u << 0.3, 0.3;
+                // mppi_param.sigma_u = mppi_sigma_u.asDiagonal();        
+            }
+            else if (target == "Log-MPPI") {
+                log_mppi_param.Nu = N[p1];
+                log_mppi_param.gamma_u = 100.0;
+                log_mppi_param.sigma_u = SIGMA_U[p2] * Eigen::MatrixXd::Identity(model.dim_u, model.dim_u);
+                // Eigen::VectorXd log_mppi_sigma_u(model.dim_u);
+                // log_mppi_sigma_u << 0.1, 0.1;
+                // log_mppi_param.sigma_u = log_mppi_sigma_u.asDiagonal();
+            }
+            else if (target == "Smooth-MPPI") {
+                smooth_mppi_param1.Nu = N[p1];
+                smooth_mppi_param1.gamma_u = 10.0;
+                smooth_mppi_param1.sigma_u = SIGMA_U[p2] * Eigen::MatrixXd::Identity(model.dim_u, model.dim_u);
+                // Eigen::VectorXd smooth_mppi_sigma_u(model.dim_u);
+                // smooth_mppi_sigma_u << 0.3, 0.3;
+                // smooth_mppi_param1.sigma_u = smooth_mppi_sigma_u.asDiagonal();
+                smooth_mppi_param2.dt = 1.0;
+                smooth_mppi_param2.lambda = 15.0;
+                Eigen::VectorXd w(model.dim_u);
+                w << 0.8, 0.8;
+                smooth_mppi_param2.w = w.asDiagonal();
+            }
+            else if (target == "MPPI-IPDDP") {
+                mi_mppi_param.Nu = N[p1];
+                mi_mppi_param.gamma_u = 100.0;
+                mi_mppi_param.sigma_u = SIGMA_U[p2] * Eigen::MatrixXd::Identity(model.dim_u, model.dim_u);
+                // Eigen::VectorXd mi_sigma_u(model.dim_u);
+                // mi_sigma_u << 0.5, 0.5;
+                // mi_mppi_param.sigma_u = mi_sigma_u.asDiagonal();
+
+                // Corridor Parameter
+                corridor_param.max_iter = 3;
+                corridor_param.Nz = 1000;
+                corridor_param.gamma_z = 1000.0;
+                Eigen::VectorXd sigma_z(model.center_point + 1);
+                sigma_z << 0.3, 0.3, 0.1;
+                corridor_param.sigma_z = sigma_z.asDiagonal();
+                corridor_param.lambda_c = 35.0;
+                corridor_param.lambda_r = 35.0;
+                corridor_param.r_max = 0.5;
+
+                // IPDDP Parameter
+                ipddp_param.tolerance = 1e-7;
+                ipddp_param.max_iter = 100;
+                ipddp_param.mu = 0.01;
+                ipddp_param.infeasible = true;
+                ipddp_param.q = 0.001;
+            }
+            // PARAMETERS // PARAMETERS // PARAMETERS // PARAMETERS //
+            // std::cout << "Parameter (N = " << N[p1] << ", Sigma_u = " << SIGMA_U[p2] << ")" << std::endl;
+
+            int fail = 0;
+
+            double total_msc_x = 0.0;
+            double total_msc_u = 0.0;
+            double total_tv_x = 0.0;
+            double total_tv_u = 0.0;
+
+            double total_duration = 0.0;
+            
+            for (int t = 0; t < sim_maxiter; ++t) {
+                double msc_x = 0.0; 
+                double msc_u = 0.0;
+                double tv_x = 0.0;
+                double tv_u = 0.0;
+
+                is_failed = false;
+                
+                // MPPI
+                MPPI mppi(model);
+
+                // Log_MPPI
+                LogMPPI log_mppi(model);
+
+                // Smooth_MPPI
+                SmoothMPPI smooth_mppi(model);
+
+                // MPPI_IPDDP
+                MPPI_IPDDP mppi_ipddp(model);
+
+                if (target == "MPPI") {
+                    mppi.init(mppi_param);
+                    mppi.setCollisionChecker(&collision_checker);            
+                }
+                else if (target == "Log-MPPI") {
+                    log_mppi.init(log_mppi_param);
+                    log_mppi.setCollisionChecker(&collision_checker);
+                }
+                else if (target == "Smooth-MPPI") {
+                    smooth_mppi.init2(smooth_mppi_param1, smooth_mppi_param2);
+                    smooth_mppi.setCollisionChecker(&collision_checker);
+                }
+                else if (target == "MPPI-IPDDP") {
+                    mppi_ipddp.init(mppi_param, corridor_param, ipddp_param);
+                    mppi_ipddp.setCollisionChecker(&collision_checker);
+                }
+                
+                double iter_duration = 0.0;
+                int i;
+                for (i = 0; i < max_iter; ++i) {
+                    if (target == "MPPI") {
+                        auto start = std::chrono::high_resolution_clock::now();
+                        mppi.solve();
+                        auto finish = std::chrono::high_resolution_clock::now();
+                        std::chrono::duration<double> elapsed = finish - start;
+                        iter_duration += elapsed.count();
+                        res_X = mppi.getResX();
+                        res_U = mppi.getResU();
+                    }
+                    else if (target == "Log-MPPI") {
+                        auto start = std::chrono::high_resolution_clock::now();
+                        log_mppi.solve();
+                        auto finish = std::chrono::high_resolution_clock::now();
+                        std::chrono::duration<double> elapsed = finish - start;
+                        iter_duration += elapsed.count();
+                        res_X = log_mppi.getResX();
+                        res_U = log_mppi.getResU();
+                    }
+                    else if (target == "Smooth-MPPI") {
+                        auto start = std::chrono::high_resolution_clock::now();
+                        smooth_mppi.solve();
+                        auto finish = std::chrono::high_resolution_clock::now();
+                        std::chrono::duration<double> elapsed = finish - start;
+                        iter_duration += elapsed.count();
+                        res_X = smooth_mppi.getResX();
+                        res_U = smooth_mppi.getResU();
+                    }
+                    else if (target == "MPPI-IPDDP") {
+                        mppi_ipddp.solve(1);
+                        iter_duration += mppi_ipddp.mppi_duration+mppi_ipddp.corridor_duration+mppi_ipddp.ipddp_duration;
+                        res_X = mppi_ipddp.X;
+                        res_U = mppi_ipddp.U;
+                    }
+
+                    if ((final_state - res_X.col(model.N)).norm() < 0.1) {
+                        bool is_collision = false;
+                        for (int j = 0; j < model.N; ++j) {
+                            if (collision_checker.getCollisionGrid(res_X.col(j))) {
+                                is_collision = true;
+                                break;
+                            }
+                        }
+                        if (!is_collision) {
+                            break;
+                        }
+                    }
+                    if (i + 1 == max_iter) {
+                        is_failed = true;
+                    }
+                }
+                if (!is_failed) {
+                    total_duration += iter_duration;
+                    msc_x = meanSquaredCurvature(res_X);
+                    msc_u = meanSquaredCurvature(res_U);
+                    tv_x = totalVariation(res_X);
+                    tv_u = totalVariation(res_U);
+                }
+                else {fail++;}
+                double fs_error = (final_state - res_X.col(model.N)).norm();
+                total_msc_x += msc_x;
+                total_msc_u += msc_u;
+                total_tv_x += tv_x;
+                total_tv_u += tv_u;
+                // std::cout << std::fixed << std::setprecision(6);
+                // std::cout.fill('0');
+                // std::cout.width(8);
+                // std::cout<<iter_duration<<'\t'<<i<<'\t'<<fs_error<<'\t'<<(int)is_failed<<"\t";
+                // std::cout.fill('0');
+                // std::cout.width(8);
+                // std::cout<<msc_x<<'\t'<<msc_u<<'\t'<<tv_x<<'\t'<<tv_u<<std::endl;
+            }
+            std::cout << std::fixed << std::setprecision(2);
+            // std::cout.fill(' ');
+            // std::cout.width(8);
+            std::cout<<N[p1]<<'\t'<<SIGMA_U[p2]<<'\t'<<sim_maxiter - fail<<'\t'<<fail<<"\t";
+            std::cout << std::fixed << std::setprecision(6);
+            std::cout.fill('0');
+            std::cout.width(8);
+            std::cout<<total_msc_x<<'\t'<<total_msc_u<<'\t'<<total_tv_x<<'\t'<<total_tv_u<<'\t'<<total_duration/std::max(1,sim_maxiter-fail)<<'\t'<<total_duration<<std::endl;
+            // std::cout << "Parameter (N = " << N[p1] << ", Sigma_u = " << SIGMA_U[p2] << ")" << std::endl;
+            // std::cout << "Success Rate : " << (int)(((sim_maxiter - fail)/(float)sim_maxiter)*100.0) << "% (Fail : " << fail << "/" << sim_maxiter << ")" << std::endl;
+            // std::cout << "Mean Squared Curvature X : " << total_msc_x << std::endl;
+            // std::cout << "Mean Squared Curvature U : " << total_msc_u << std::endl;
+            // std::cout << "Total Variation X : " << total_tv_x << std::endl;
+            // std::cout << "Total Variation U : " << total_tv_u << std::endl;
+            // std::cout << "Average : " << total_duration/(sim_maxiter-fail) << " Seconds (Total " << total_duration << ")" << std::endl;
+        }
+    }
 
     return 0;
 }

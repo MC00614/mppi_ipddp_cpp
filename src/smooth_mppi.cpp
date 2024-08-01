@@ -26,7 +26,7 @@ int main() {
     Eigen::VectorXd final_state(model.dim_x);
     final_state << 0.0, 6.0, M_PI_2;
     Eigen::MatrixXd res_X, res_U;
-    int max_iter = 100;
+    int max_iter = 10000;
     double total_duration = 0.0;
     bool is_failed;
     int fail = 0;
@@ -49,7 +49,7 @@ int main() {
         // Smooth_MPPI
         SmoothMPPI smooth_mppi(model);
         MPPIParam smooth_mppi_param1;
-        smooth_mppi_param1.Nu = 1000;
+        smooth_mppi_param1.Nu = 300;
         smooth_mppi_param1.gamma_u = 10.0;
         Eigen::VectorXd sigma_u_1(model.dim_u);
         sigma_u_1 << 0.3, 0.3;
