@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
     std::cout<<"Target = "<<target<<std::endl;
     std::cout<<"Simulate "<<sim_maxiter<<" times for each"<<std::endl;
 
-    std::cout << "N\tS_u\tP\tF\tt_msc_x\tt_msc_u\tt_tv_x\t\tt_tv_u\t\tavg_time\ttotal_time" << std::endl;
+    std::cout << "N\tS_u\tP\tF\ta_msc_x\ta_msc_u\ta_tv_x\t\ta_tv_u\t\tavg_time\ttotal_time" << std::endl;
 
     for (int p1 = 0; p1 < N.size(); ++p1) {
         for (int p2 = 0; p2 < SIGMA_U.size(); ++p2) {
@@ -253,11 +253,12 @@ int main(int argc, char* argv[]) {
             std::cout << std::fixed << std::setprecision(2);
             // std::cout.fill(' ');
             // std::cout.width(8);
+            int success = std::max(1, sim_maxiter - fail);
             std::cout<<N[p1]<<'\t'<<SIGMA_U[p2]<<'\t'<<sim_maxiter - fail<<'\t'<<fail<<"\t";
             std::cout << std::fixed << std::setprecision(6);
             std::cout.fill('0');
             std::cout.width(8);
-            std::cout<<total_msc_x<<'\t'<<total_msc_u<<'\t'<<total_tv_x<<'\t'<<total_tv_u<<'\t'<<total_duration/std::max(1,sim_maxiter-fail)<<'\t'<<total_duration<<std::endl;
+            std::cout<<(total_msc_x/success)<<'\t'<<(total_msc_u/success)<<'\t'<<(total_tv_x/success)<<'\t'<<(total_tv_u/success)<<'\t'<<total_duration/success<<'\t'<<total_duration<<std::endl;
             // std::cout << "Parameter (N = " << N[p1] << ", Sigma_u = " << SIGMA_U[p2] << ")" << std::endl;
             // std::cout << "Success Rate : " << (int)(((sim_maxiter - fail)/(float)sim_maxiter)*100.0) << "% (Fail : " << fail << "/" << sim_maxiter << ")" << std::endl;
             // std::cout << "Mean Squared Curvature X : " << total_msc_x << std::endl;
