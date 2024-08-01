@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
 
             double total_duration = 0.0;
             double max_duration = 0.0;
-            double min_duration = 1000.0;
+            double min_duration = max_sim_duration;
             
             for (int t = 0; t < sim_maxiter; ++t) {
                 double msc_x = 0.0; 
