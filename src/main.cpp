@@ -13,9 +13,11 @@
 
 int main(int argc, char* argv[]) {
     std::string target;
+    int sim_maxiter;
 
     if (argc > 1) {
         target = argv[1];
+        sim_maxiter = std::stoi(argv[2]);
     }
 
     // Model
@@ -67,9 +69,8 @@ int main(int argc, char* argv[]) {
     Eigen::VectorXd final_state(model.dim_x);
     final_state << 0.0, 6.0, M_PI_2;
     Eigen::MatrixXd res_X, res_U;
-    int max_iter = 10000;
+    double max_sim_duration = 1.0;
     bool is_failed;
-    int sim_maxiter = 1;
 
     // 100 200 400 800 1600 3200 6400 12800 25600
     std::vector<int> N;
@@ -77,14 +78,14 @@ int main(int argc, char* argv[]) {
         N.push_back(100 * std::pow(2, n));
     }
     std::vector<double> SIGMA_U;
-    for (int n = 0; n < 9; ++n) {
-        SIGMA_U.push_back(0.1 + (0.1 * n));
+    for (int n = 1; n < 10; ++n) {
+        SIGMA_U.push_back(0.1 * n);
     }
 
     std::cout<<"Target = "<<target<<std::endl;
     std::cout<<"Simulate "<<sim_maxiter<<" times for each"<<std::endl;
 
-    std::cout << "N\tS_u\tP\tF\ta_msc_x\ta_msc_u\ta_tv_x\t\ta_tv_u\t\tavg_time\ttotal_time" << std::endl;
+    std::cout << "N\tS_u\tP\tF\ta_msc_x\ta_msc_u\ta_tv_x\t\ta_tv_u\t\tavg_time\tmin_time\tmax_time" << std::endl;
 
     for (int p1 = 0; p1 < N.size(); ++p1) {
         for (int p2 = 0; p2 < SIGMA_U.size(); ++p2) {
@@ -138,6 +139,8 @@ int main(int argc, char* argv[]) {
             double total_tv_u = 0.0;
 
             double total_duration = 0.0;
+            double max_duration = 0.0;
+            double min_duration = 1000.0;
             
             for (int t = 0; t < sim_maxiter; ++t) {
                 double msc_x = 0.0; 
@@ -177,8 +180,7 @@ int main(int argc, char* argv[]) {
                 }
                 
                 double iter_duration = 0.0;
-                int i;
-                for (i = 0; i < max_iter; ++i) {
+                while (true) {
                     if (target == "MPPI") {
                         auto start = std::chrono::high_resolution_clock::now();
                         mppi.solve();
@@ -225,12 +227,15 @@ int main(int argc, char* argv[]) {
                             break;
                         }
                     }
-                    if (i + 1 == max_iter) {
+                    if (max_sim_duration < iter_duration) {
                         is_failed = true;
+                        break;
                     }
                 }
                 if (!is_failed) {
                     total_duration += iter_duration;
+                    min_duration = std::min(min_duration, iter_duration);
+                    max_duration = std::max(max_duration, iter_duration);
                     msc_x = meanSquaredCurvature(res_X);
                     msc_u = meanSquaredCurvature(res_U);
                     tv_x = totalVariation(res_X);
@@ -258,7 +263,7 @@ int main(int argc, char* argv[]) {
             std::cout << std::fixed << std::setprecision(6);
             std::cout.fill('0');
             std::cout.width(8);
-            std::cout<<(total_msc_x/success)<<'\t'<<(total_msc_u/success)<<'\t'<<(total_tv_x/success)<<'\t'<<(total_tv_u/success)<<'\t'<<total_duration/success<<'\t'<<total_duration<<std::endl;
+            std::cout<<(total_msc_x/success)<<'\t'<<(total_msc_u/success)<<'\t'<<(total_tv_x/success)<<'\t'<<(total_tv_u/success)<<'\t'<<total_duration/success<<'\t'<<min_duration<<'\t'<<max_duration<<std::endl;
             // std::cout << "Parameter (N = " << N[p1] << ", Sigma_u = " << SIGMA_U[p2] << ")" << std::endl;
             // std::cout << "Success Rate : " << (int)(((sim_maxiter - fail)/(float)sim_maxiter)*100.0) << "% (Fail : " << fail << "/" << sim_maxiter << ")" << std::endl;
             // std::cout << "Mean Squared Curvature X : " << total_msc_x << std::endl;
