@@ -35,7 +35,24 @@ int main(int argc, char* argv[]) {
     //MPPI_IPDDP
     MPPIParam mi_mppi_param;
     CorridorParam corridor_param;
+    // Corridor Parameter
+    corridor_param.max_iter = 3;
+    corridor_param.Nz = 1000;
+    corridor_param.gamma_z = 1000.0;
+    Eigen::VectorXd sigma_z(model.center_point + 1);
+    sigma_z << 0.3, 0.3, 0.1;
+    corridor_param.sigma_z = sigma_z.asDiagonal();
+    corridor_param.lambda_c = 35.0;
+    corridor_param.lambda_r = 35.0;
+    corridor_param.r_max = 0.5;
+
     Param ipddp_param;
+    // IPDDP Parameter
+    ipddp_param.tolerance = 1e-7;
+    ipddp_param.max_iter = 100;
+    ipddp_param.mu = 0.01;
+    ipddp_param.infeasible = true;
+    ipddp_param.q = 0.001;
     // PARAMETERS // PARAMETERS // PARAMETERS // PARAMETERS //
 
     // Collision Checker
@@ -109,23 +126,6 @@ int main(int argc, char* argv[]) {
                 // mi_sigma_u << 0.5, 0.5;
                 // mi_mppi_param.sigma_u = mi_sigma_u.asDiagonal();
 
-                // Corridor Parameter
-                corridor_param.max_iter = 3;
-                corridor_param.Nz = 1000;
-                corridor_param.gamma_z = 1000.0;
-                Eigen::VectorXd sigma_z(model.center_point + 1);
-                sigma_z << 0.3, 0.3, 0.1;
-                corridor_param.sigma_z = sigma_z.asDiagonal();
-                corridor_param.lambda_c = 35.0;
-                corridor_param.lambda_r = 35.0;
-                corridor_param.r_max = 0.5;
-
-                // IPDDP Parameter
-                ipddp_param.tolerance = 1e-7;
-                ipddp_param.max_iter = 100;
-                ipddp_param.mu = 0.01;
-                ipddp_param.infeasible = true;
-                ipddp_param.q = 0.001;
             }
             // PARAMETERS // PARAMETERS // PARAMETERS // PARAMETERS //
             // std::cout << "Parameter (N = " << N[p1] << ", Sigma_u = " << SIGMA_U[p2] << ")" << std::endl;
