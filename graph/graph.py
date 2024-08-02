@@ -18,8 +18,8 @@ for handling_data in handling_datas:
     Z2 = df['avg_time'].values.reshape(X.shape)
     Z3 = df['a_msc_x'].values.reshape(X.shape)
     Z4 = df['a_msc_u'].values.reshape(X.shape)
-    Z3[Z3 == 0] = 0.01
-    Z4[Z4 == 0] = 6.0
+    # Z3[Z3 == 0] = 0.01
+    # Z4[Z4 == 0] = 6.0
 
     fig = plt.figure()
     fig.suptitle(handling_data, fontsize=50, fontweight='bold')

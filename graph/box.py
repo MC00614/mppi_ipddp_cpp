@@ -60,7 +60,7 @@ for i, handling_data in enumerate(handling_datas):
     ax2.text(2.260, q1, f'Q1: {q1:.2f}', fontsize=12, ha='left')
     ax2.text(2.260, median2, f'Median: {median2:.2f}', fontsize=12, ha='left')
     ax2.text(2.260, q3, f'Q3: {q3:.2f}', fontsize=12, ha='left')
-    print(f'{q1:.2f}\t{median1:.2f}\t{q3:.2f}')
+    print(f'{q1:.2f}\t{median2:.2f}\t{q3:.2f}')
 
 plt.subplots_adjust(wspace=0.3, hspace=0.3)
 plt.show()
