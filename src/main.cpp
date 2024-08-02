@@ -175,7 +175,7 @@ int main(int argc, char* argv[]) {
                     smooth_mppi.setCollisionChecker(&collision_checker);
                 }
                 else if (target == "MPPI-IPDDP") {
-                    mppi_ipddp.init(mppi_param, corridor_param, ipddp_param);
+                    mppi_ipddp.init(mi_mppi_param, corridor_param, ipddp_param);
                     mppi_ipddp.setCollisionChecker(&collision_checker);
                 }
                 
@@ -215,6 +215,11 @@ int main(int argc, char* argv[]) {
                         res_U = mppi_ipddp.U;
                     }
 
+                    if (max_sim_duration < iter_duration) {
+                        is_failed = true;
+                        break;
+                    }
+
                     if ((final_state - res_X.col(model.N)).norm() < 0.1) {
                         bool is_collision = false;
                         for (int j = 0; j < model.N; ++j) {
@@ -226,10 +231,6 @@ int main(int argc, char* argv[]) {
                         if (!is_collision) {
                             break;
                         }
-                    }
-                    if (max_sim_duration < iter_duration) {
-                        is_failed = true;
-                        break;
                     }
                 }
                 if (!is_failed) {
