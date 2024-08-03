@@ -73,3 +73,12 @@ target_link_libraries(main
 #     ${PYTHON_LIBRARIES}
 #     OpenMP::OpenMP_CXX
 # )
+# # Receding
+# add_executable(receding
+#     src/receding.cpp
+# )
+# target_compile_options(receding PRIVATE -O3)
+# target_link_libraries(receding
+#     ${PYTHON_LIBRARIES}
+#     OpenMP::OpenMP_CXX
+# )
