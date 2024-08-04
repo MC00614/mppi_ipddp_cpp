@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
     Eigen::VectorXd final_state(model.dim_x);
     final_state << 0.0, 6.0, M_PI_2;
     Eigen::MatrixXd res_X, res_U;
-    double max_sim_duration = 1.0;
+    double max_sim_duration = 10.0;
     bool is_failed;
 
     // 100 200 400 800 1600 3200 6400 12800 25600

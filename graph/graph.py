@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 handling_datas = ['MPPI', 'Log_MPPI', 'Smooth_MPPI', 'MPPI_IPDDP']
 
 for handling_data in handling_datas:
-    file_path = 'other_mppi.xlsx'
+    file_path = '10other_mppi.xlsx'
     df = pd.read_excel(file_path, sheet_name=handling_data)
 
     # N	S_u	P
@@ -18,8 +18,8 @@ for handling_data in handling_datas:
     Z2 = df['avg_time'].values.reshape(X.shape)
     Z3 = df['a_msc_x'].values.reshape(X.shape)
     Z4 = df['a_msc_u'].values.reshape(X.shape)
-    # Z3[Z3 == 0] = 0.01
-    # Z4[Z4 == 0] = 6.0
+    Z3[Z3 == 0] = 0.015
+    Z4[Z4 == 0] = 6.5
 
     fig = plt.figure()
     fig.suptitle(handling_data, fontsize=50, fontweight='bold')
@@ -38,7 +38,7 @@ for handling_data in handling_datas:
     ax1.set_xlabel('Sigma_u', fontsize=20, labelpad=15)
     ax1.set_ylabel('N', fontsize=20, labelpad=15)
     ax1.set_zlabel('Time', fontsize=20, labelpad=15)
-    ax1.set_zlim(0, 1)
+    ax1.set_zlim(0, 10)
     ax1.view_init(azim=-130, elev=50)
     ax1.set_title('Average Time', fontsize=30, pad=50, fontweight='bold')
 
@@ -48,7 +48,7 @@ for handling_data in handling_datas:
     ax1.set_ylabel('N', fontsize=20, labelpad=15)
     ax1.set_zlabel('Curvature', fontsize=20, labelpad=15)
     ax1.view_init(azim=-130, elev=50)
-    ax1.set_zlim(0, 0.01)
+    ax1.set_zlim(0, 0.015)
     ax1.set_title('Mean Squared Curvature X', fontsize=30, pad=50, fontweight='bold')
 
     ax1 = fig.add_subplot(224, projection='3d')
@@ -57,7 +57,7 @@ for handling_data in handling_datas:
     ax1.set_ylabel('N', fontsize=20, labelpad=15)
     ax1.set_zlabel('Curvature', fontsize=20, labelpad=15)
     ax1.view_init(azim=-130, elev=50)
-    ax1.set_zlim(0, 6)
+    ax1.set_zlim(0, 6.5)
     ax1.set_title('Mean Squared Curvature U', fontsize=30, pad=50, fontweight='bold')
 
     plt.show()
