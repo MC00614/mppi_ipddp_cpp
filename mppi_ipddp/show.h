@@ -2,6 +2,64 @@
 
 namespace plt = matplotlibcpp;
 
+inline void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &mppi_U, const std::string& file_path, double resolution) {
+    std::vector<std::vector<double>> X_MPPI(mppi_X.rows(), std::vector<double>(mppi_X.cols()));
+    for (int i = 0; i < mppi_X.rows(); ++i) {
+        for (int j = 0; j < mppi_X.cols(); ++j) {
+            X_MPPI[i][j] = mppi_X(i, j);
+        }
+    }
+    std::vector<std::vector<double>> U_MPPI(mppi_U.rows(), std::vector<double>(mppi_U.cols()));
+    for (int i = 0; i < mppi_U.rows(); ++i) {
+        for (int j = 0; j < mppi_U.cols(); ++j) {
+            U_MPPI[i][j] = mppi_U(i, j);
+        }
+    }
+
+    std::vector<std::vector<double>> map;
+    std::ifstream file(file_path);
+    std::string line;
+
+    while (std::getline(file, line)) {
+        std::vector<double> row;
+        std::string::size_type sz = 0;
+
+        if (!file.is_open()) {
+            throw std::runtime_error("Error opening file: " + file_path);
+        }
+
+        while (sz < line.length()) {
+            double value = std::stod(line, &sz);
+            row.push_back(value);
+            line = line.substr(sz);
+        }
+
+        map.push_back(row);
+    }
+    file.close();
+
+    plt::scatter(X_MPPI[0], X_MPPI[1], 10.0, {{"color", "b"}});
+    plt::plot(X_MPPI[0], X_MPPI[1], "b");
+
+    double hl = 0.05;
+    for (int i = 0; i < map.size(); ++i) {
+        for (int j = 0; j < map[0].size(); ++j) {
+            if (map[i][j] == 10) {
+                double mx = i*resolution;
+                double my = j*resolution;
+                std::vector<double> oX = {mx-hl, mx+hl, mx+hl, mx-hl, mx-hl};
+                std::vector<double> oY = {my-hl,my-hl,my+hl,my+hl,my-hl};
+                plt::plot(oX, oY, "k");
+            }
+        }
+    }
+    
+    plt::xlim(0, 3);
+    plt::ylim(0, 5);
+    plt::grid(true);
+    plt::show();
+}
+
 inline void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &mppi_U, const Eigen::MatrixXd &X, const Eigen::MatrixXd &U, const Eigen::MatrixXd &C, const Eigen::VectorXd &R,
             const std::vector<std::array<double,4>> &circles, const std::vector<std::array<double,4>> &rectangles) {
 
@@ -69,8 +127,10 @@ inline void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &mppi_U,
     plt::named_plot("MPPI-IPDDP", X_RES[0], X_RES[1], "r");
     plt::scatter(X_MPPI[0], X_MPPI[1], 10.0, {{"color", "b"}});
     plt::scatter(X_RES[0], X_RES[1], 10.0, {{"color", "r"}});
-    plt::xlim(-4, 4);
-    plt::ylim(-1, 7);
+    plt::xlim(0, 3);
+    plt::ylim(0, 5);
+    // plt::xlim(-4, 4);
+    // plt::ylim(-1, 7);
     plt::grid(true);
     plt::legend({{"fontsize", "20"}});
 
@@ -97,8 +157,10 @@ inline void show2D(const Eigen::MatrixXd &mppi_X, const Eigen::MatrixXd &mppi_U,
     // plt::named_plot("MPPI-IPDDP", X_RES[0], X_RES[1], "b");
     plt::scatter(X_MPPI[0], X_MPPI[1], 10.0, {{"color", "b"}});
     plt::scatter(X_RES[0], X_RES[1], 10.0, {{"color", "r"}});
-    plt::xlim(-4, 4);
-    plt::ylim(-1, 7);
+    plt::xlim(0, 3);
+    plt::ylim(0, 5);
+    // plt::xlim(-4, 4);
+    // plt::ylim(-1, 7);
     plt::grid(true);
     // plt::legend({{"fontsize", "20"}});
 

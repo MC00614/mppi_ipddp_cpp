@@ -34,6 +34,16 @@ target_link_libraries(main
     OpenMP::OpenMP_CXX
 )
 
+add_executable(test_with_map
+    src/test_with_map.cpp
+)
+target_compile_options(test_with_map PRIVATE -O3)
+
+target_link_libraries(test_with_map
+    ${PYTHON_LIBRARIES}
+    OpenMP::OpenMP_CXX
+)
+
 # # Log_MPPI
 # add_executable(log_mppi
 #     src/log_mppi.cpp

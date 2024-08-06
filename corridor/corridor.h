@@ -72,6 +72,7 @@ void Corridor::solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::Vector
         for (int t = 0; t < N; ++t) {
             Eigen::MatrixXd Zi(center_point + 1, Nz);
             Zi = Z.col(t).replicate(1, Nz) + (this->sigma_z * norm_gen.template generate<Eigen::MatrixXd>(center_point + 1, Nz, urng));
+            hz(Zi);
             Eigen::VectorXd costs(Nz);
             costs = lambda_c * (Zi.topRows(center_point).colwise() - X.col(t).topRows(center_point)).colwise().norm();
             costs -= lambda_r * Zi.bottomRows(1).transpose();
