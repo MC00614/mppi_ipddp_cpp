@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
     MPPIParam mi_mppi_param;
     CorridorParam corridor_param;
     // Corridor Parameter
-    corridor_param.max_iter = 5;
+    corridor_param.max_iter = 3;
     corridor_param.Nz = 1000;
     corridor_param.gamma_z = 1000.0;
     Eigen::VectorXd sigma_z(model.center_point + 1);
