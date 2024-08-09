@@ -5,7 +5,7 @@ Implementation of the [MPPI-IPDDP](https://arxiv.org/abs/2208.02439) in C++.
 # Key Features
 - Header only solver
 - CPU multi-processing
-- Benchmark with MPPI variants
+- Benchmark with MPPI variants and multiple environments
 - Collision Checker can be modified on demand
 - Custom model can be easily configured
 
@@ -77,4 +77,5 @@ To test with 300 maps, use [test_with_map.cpp](src/test_with_map.cpp) with `spec
 
 # Future Works
 - GPU Acceleration
-- More general constraint handling
+- More general constraint handling in model
+- Custom implementation of diffential with dual number
