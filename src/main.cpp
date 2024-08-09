@@ -1,7 +1,6 @@
 #include "wmrobot.h"
 
 #include "collision_checker.h"
-#include "show.h"
 #include "parameter.h"
 
 #include "mppi.h"

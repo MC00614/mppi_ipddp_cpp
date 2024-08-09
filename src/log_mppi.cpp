@@ -1,12 +1,9 @@
 #include "wmrobot.h"
 
 #include "collision_checker.h"
-#include "mppi_ipddp.h"
-#include "show.h"
 #include "parameter.h"
 
 #include "log_mppi.h"
-#include "smooth_mppi.h"
 
 #include <chrono>
 

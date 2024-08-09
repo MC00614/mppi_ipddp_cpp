@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
 project(mppi_ipddp)
-find_package(PythonLibs REQUIRED)
 find_package (Eigen3 REQUIRED NO_MODULE)
 find_package(OpenMP REQUIRED)
 
@@ -12,9 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)       # avoid compile flags of the type -std=gnu++
 include_directories(
     EigenRand/
     autodiff/
-    matplotlibcpp/
     ${EIGEN3_INCLUDE_DIRS}
-    ${PYTHON_INCLUDE_DIRS}
 
     mppi/mppi/
     corridor/
@@ -29,7 +26,6 @@ add_executable(main
 )
 target_compile_options(main PRIVATE -O3)
 target_link_libraries(main
-    ${PYTHON_LIBRARIES}
     OpenMP::OpenMP_CXX
 )
 
@@ -39,7 +35,6 @@ add_executable(test_with_map
 )
 target_compile_options(test_with_map PRIVATE -O3)
 target_link_libraries(test_with_map
-    ${PYTHON_LIBRARIES}
     OpenMP::OpenMP_CXX
 )
 
@@ -49,7 +44,6 @@ add_executable(log_mppi
 )
 target_compile_options(log_mppi PRIVATE -O3)
 target_link_libraries(log_mppi
-    ${PYTHON_LIBRARIES}
     OpenMP::OpenMP_CXX
 )
 
@@ -59,7 +53,6 @@ add_executable(mppi_ipddp
 )
 target_compile_options(mppi_ipddp PRIVATE -O3)
 target_link_libraries(mppi_ipddp
-    ${PYTHON_LIBRARIES}
     OpenMP::OpenMP_CXX
 )
 
@@ -69,7 +62,6 @@ add_executable(smooth_mppi
 )
 target_compile_options(smooth_mppi PRIVATE -O3)
 target_link_libraries(smooth_mppi
-    ${PYTHON_LIBRARIES}
     OpenMP::OpenMP_CXX
 )
 
@@ -79,7 +71,6 @@ add_executable(mppi
 )
 target_compile_options(mppi PRIVATE -O3)
 target_link_libraries(mppi
-    ${PYTHON_LIBRARIES}
     OpenMP::OpenMP_CXX
 )
 
@@ -89,6 +80,14 @@ add_executable(receding
 )
 target_compile_options(receding PRIVATE -O3)
 target_link_libraries(receding
-    ${PYTHON_LIBRARIES}
+    OpenMP::OpenMP_CXX
+)
+
+# Example
+add_executable(example
+    src/example.cpp
+)
+target_compile_options(example PRIVATE -O3)
+target_link_libraries(example
     OpenMP::OpenMP_CXX
 )
