@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 handling_datas = ['MPPI', 'Log_MPPI', 'Smooth_MPPI', 'MPPI_IPDDP']
 
 for handling_data in handling_datas:
-    file_path = '10other_mppi.xlsx'
+    file_path = 'other_mppi.xlsx'
     df = pd.read_excel(file_path, sheet_name=handling_data)
 
     # N	S_u	P
