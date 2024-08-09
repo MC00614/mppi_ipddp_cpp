@@ -3,26 +3,29 @@
 Implementation of the [MPPI-IPDDP](https://arxiv.org/abs/2208.02439) in C++.
 
 # Key Features
-- Header only solver
+- Header only library solver
 - CPU multi-processing
 - Benchmark with MPPI variants and multiple environments
-- Collision Checker can be modified on demand
-- Custom model can be easily configured
+- Collision Checker can be easily modified on demand
+- Easy custom model configuration
 
 # Usage
 ## Download Dependency
 ### Build Dependancy
-`EigenRand` and `autodiff` need to be named as in CMakeLists.txt.
-- [autodiff](https://github.com/autodiff/autodiff)
+**EigenRand** and **autodiff** need to be named as in CMakeLists.txt.
 - [Eigen 3.3.9](https://gitlab.com/libeigen/eigen/-/releases/3.3.9)
 - [EigenRand](https://github.com/bab2min/EigenRand)
+- [autodiff](https://github.com/autodiff/autodiff)
 
 ### Runtime Only Dependancy
 For testing in diffent environment, we use `.npy` maps from `BARN Dataset`.
 - [BARN_dataset](https://www.cs.utexas.edu/~xiao/BARN/BARN.html)
 
 ## Build with CMake
-```
+Note that **EigenRand** and **autodiff** need to be under **mppi_ipddp_cpp**.
+```bash
+git clone https://github.com/MC00614/mppi_ipddp_cpp.git
+cd mppi_ipddp_cpp
 mkdir build && cd build
 cmake.. && make
 ```
@@ -43,7 +46,7 @@ For simple usage, refer [example.cpp](src/example.cpp) with Wheeled Mobile Robot
 | ![Smooth-MPPI](doc/3Dplot/smooth-mppi.png) | ![MPPI-IPDDP](doc/3Dplot/mppi-ipddp.png) | !
 
 
-To reproduce this, refer [main.cpp](src/main.cpp) with `specific Target` and `Number of Simulations`
+To reproduce this, refer [main.cpp](src/main.cpp) with **Specific Target** and **Number of Simulations**
 ```cpp
 // Target: MPPI-IPDDP, Simulations: 10
 ./main MPPI-IPDDP 10
@@ -69,7 +72,7 @@ Graphical tool for plot can be found in [graph](graph/) (`box.py`, `graph.py`), 
 | **Q3 Time** | 0.179549| 0.232929 | 0.598198    | 0.346971   |
 | **MSC**     | 0.002528| 0.003089 | 0.005856    | 0.000139   |
 
-To test with 300 maps, use [test_with_map.cpp](src/test_with_map.cpp) with `specific Target`
+To test with 300 maps, use [test_with_map.cpp](src/test_with_map.cpp) with **Specific Target**
 ```cpp
 // Target: MPPI-IPDDP
 ./test_with_map MPPI-IPDDP
