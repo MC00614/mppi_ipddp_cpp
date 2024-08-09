@@ -52,6 +52,17 @@ Graphical Tool can be found in graph, written in Python.
 | **(c) Inflate** | **(d) Distance** |
 | ![inflate](doc/Barn/inflate.png) | ![distance](doc/Barn/distance.png) | !
 
+## Results  
+| Metric      | MPPI    | Log MPPI | Smooth MPPI | MPPI IPDDP |
+|:-----------:|:------:|:--------:|:-----------:|:----------:|
+| **Nu (𝑵𝒖)**          | 3200    | 3200     | 12800       | 1600       |
+| **Σu (𝜮𝒖)**          | 0.2     | 0.1      | 0.3         | 0.4        |
+| **Success** | 97      | 97       | 91.3        | 95.7       |
+| **Q1 Time** | 0.121522| 0.169059 | 0.446100    | 0.274369   |
+| **Q2 Time** | 0.139242| 0.197344 | 0.511798    | 0.299426   |
+| **Q3 Time** | 0.179549| 0.232929 | 0.598198    | 0.346971   |
+| **MSC**     | 0.002528| 0.003089 | 0.005856    | 0.000139   |
+
 # Future Works
 - GPU Acceleration
 - More general constraint handling
