@@ -17,6 +17,11 @@ int main(int argc, char* argv[]) {
     if (argc > 1) {
         target = argv[1];
     }
+    else {
+        std::cerr << "Error: No target specified.\n";
+        std::cerr << "Usage: " << argv[0] << " <target name>\n";
+        return 1;
+    }
 
     // Model
     auto model = WMRobotMap();
@@ -67,7 +72,6 @@ int main(int argc, char* argv[]) {
     std::cout<<"Target = "<<target<<std::endl;
 
     std::cout << "map_number\titer_duration\tfinal_error\tfailed\tmsc_x\t\tmsc_u\t\ttv_x\t\ttv_u" << std::endl;
-    // std::cout << "N\tS_u\tP\tF\ta_msc_x\ta_msc_u\ta_tv_x\t\ta_tv_u\t\tavg_time\tmin_time\tmax_time" << std::endl;
 
     int fail = 0;
     double total_msc_x = 0.0;
@@ -80,10 +84,9 @@ int main(int argc, char* argv[]) {
     double min_duration = max_sim_duration;
 
     for (int i = 0; i < 300; ++i) {
-    // for (int i = 299; i > -1; --i) {
         // Collision Checker
         CollisionChecker collision_checker;
-        std::string map_file_path = "../BARN_dataset/inflated_txt_files/output_" + std::to_string(i) + ".txt";
+        std::string map_file_path = "../BARN_dataset/txt_files/output_" + std::to_string(i) + ".txt";
         collision_checker.loadMap(map_file_path, 0.1);
 
         // PARAMETERS // PARAMETERS // PARAMETERS // PARAMETERS //
@@ -184,12 +187,7 @@ int main(int argc, char* argv[]) {
                 iter_duration += mppi_ipddp.mppi_duration+mppi_ipddp.corridor_duration+mppi_ipddp.ipddp_duration;
                 res_X = mppi_ipddp.X;
                 res_U = mppi_ipddp.U;
-                // show2D(res_X, res_U, mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
             }
-
-            // show2D(res_X, res_U, map_file_path, 0.1);
-            // show2D(res_X, res_U, mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
-
 
             if (max_sim_duration < iter_duration) {
                 is_failed = true;
@@ -217,9 +215,6 @@ int main(int argc, char* argv[]) {
             msc_u = meanSquaredCurvature(res_U);
             tv_x = totalVariation(res_X);
             tv_u = totalVariation(res_U);
-
-            // show2D(res_X, res_U, map_file_path, 0.1);
-            // show2D(res_X, res_U, mppi_ipddp.X, mppi_ipddp.U, mppi_ipddp.C, mppi_ipddp.R, collision_checker.circles, collision_checker.rectangles);
         }
         else {fail++;}
         double fs_error = (final_state - res_X.col(model.N)).norm();
@@ -234,23 +229,11 @@ int main(int argc, char* argv[]) {
         std::cout.fill('0');
         std::cout.width(8);
         std::cout<<msc_x<<'\t'<<msc_u<<'\t'<<tv_x<<'\t'<<tv_u<<std::endl;
-
-        // std::cout << std::fixed << std::setprecision(2);
-        // std::cout.fill(' ');
-        // std::cout.width(8);
-        // int success = std::max(1, sim_maxiter - fail);
-        // std::cout<<100<<'\t'<<0.1<<'\t'<<sim_maxiter - fail<<'\t'<<fail<<"\t";
-        // std::cout << std::fixed << std::setprecision(6);
-        // std::cout.fill('0');
-        // std::cout.width(8);
-        // std::cout<<(total_msc_x/success)<<'\t'<<(total_msc_u/success)<<'\t'<<(total_tv_x/success)<<'\t'<<(total_tv_u/success)<<'\t'<<total_duration/success<<'\t'<<min_duration<<'\t'<<max_duration<<std::endl;
     }
-    // std::cout << "Parameter (N = " << 100 << ", Sigma_u = " << 0.1 << ")" << std::endl;
     std::cout << "Success Rate : " << (int)(((300 - fail)/(float)300)*100.0) << "% (Fail : " << fail << "/" << 300 << ")" << std::endl;
     std::cout << "Mean Squared Curvature X : " << total_msc_x << std::endl;
     std::cout << "Mean Squared Curvature U : " << total_msc_u << std::endl;
     std::cout << "Total Variation X : " << total_tv_x << std::endl;
     std::cout << "Total Variation U : " << total_tv_u << std::endl;
-    // std::cout << "Average : " << total_duration/(300-fail) << " Seconds (Total " << total_duration << ")" << std::endl;
     return 0;
 }

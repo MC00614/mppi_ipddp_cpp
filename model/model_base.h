@@ -32,7 +32,7 @@ public:
     std::function<dual2nd(VectorXdual2nd)> p;
     // Constraint
     std::function<VectorXdual2nd(VectorXdual2nd, VectorXdual2nd, VectorXdual2nd, dual2nd)> c;
-
+    // Projection
     std::function<void(Eigen::Ref<Eigen::MatrixXd>)> h;
 };
 

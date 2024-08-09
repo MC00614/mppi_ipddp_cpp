@@ -15,9 +15,14 @@ int main(int argc, char* argv[]) {
     std::string target;
     int sim_maxiter;
 
-    if (argc > 1) {
+    if (argc > 2) {
         target = argv[1];
         sim_maxiter = std::stoi(argv[2]);
+    }
+    else {
+        std::cerr << "Error: No target specified.\n";
+        std::cerr << "Usage: " << argv[0] << " <target name>"  << " <sim iteration>\n";
+        return 1;
     }
 
     // Model
@@ -94,25 +99,16 @@ int main(int argc, char* argv[]) {
                 mppi_param.Nu = N[p1];
                 mppi_param.gamma_u = 100.0;
                 mppi_param.sigma_u = SIGMA_U[p2] * Eigen::MatrixXd::Identity(model.dim_u, model.dim_u);
-                // Eigen::VectorXd mppi_sigma_u(model.dim_u);
-                // mppi_sigma_u << 0.3, 0.3;
-                // mppi_param.sigma_u = mppi_sigma_u.asDiagonal();        
             }
             else if (target == "Log-MPPI") {
                 log_mppi_param.Nu = N[p1];
                 log_mppi_param.gamma_u = 100.0;
                 log_mppi_param.sigma_u = SIGMA_U[p2] * Eigen::MatrixXd::Identity(model.dim_u, model.dim_u);
-                // Eigen::VectorXd log_mppi_sigma_u(model.dim_u);
-                // log_mppi_sigma_u << 0.1, 0.1;
-                // log_mppi_param.sigma_u = log_mppi_sigma_u.asDiagonal();
             }
             else if (target == "Smooth-MPPI") {
                 smooth_mppi_param1.Nu = N[p1];
                 smooth_mppi_param1.gamma_u = 10.0;
                 smooth_mppi_param1.sigma_u = SIGMA_U[p2] * Eigen::MatrixXd::Identity(model.dim_u, model.dim_u);
-                // Eigen::VectorXd smooth_mppi_sigma_u(model.dim_u);
-                // smooth_mppi_sigma_u << 0.3, 0.3;
-                // smooth_mppi_param1.sigma_u = smooth_mppi_sigma_u.asDiagonal();
                 smooth_mppi_param2.dt = 1.0;
                 smooth_mppi_param2.lambda = 15.0;
                 Eigen::VectorXd w(model.dim_u);
@@ -123,13 +119,9 @@ int main(int argc, char* argv[]) {
                 mi_mppi_param.Nu = N[p1];
                 mi_mppi_param.gamma_u = 100.0;
                 mi_mppi_param.sigma_u = SIGMA_U[p2] * Eigen::MatrixXd::Identity(model.dim_u, model.dim_u);
-                // Eigen::VectorXd mi_sigma_u(model.dim_u);
-                // mi_sigma_u << 0.5, 0.5;
-                // mi_mppi_param.sigma_u = mi_sigma_u.asDiagonal();
 
             }
             // PARAMETERS // PARAMETERS // PARAMETERS // PARAMETERS //
-            // std::cout << "Parameter (N = " << N[p1] << ", Sigma_u = " << SIGMA_U[p2] << ")" << std::endl;
 
             int fail = 0;
 
@@ -248,13 +240,6 @@ int main(int argc, char* argv[]) {
                 total_msc_u += msc_u;
                 total_tv_x += tv_x;
                 total_tv_u += tv_u;
-                // std::cout << std::fixed << std::setprecision(6);
-                // std::cout.fill('0');
-                // std::cout.width(8);
-                // std::cout<<iter_duration<<'\t'<<i<<'\t'<<fs_error<<'\t'<<(int)is_failed<<"\t";
-                // std::cout.fill('0');
-                // std::cout.width(8);
-                // std::cout<<msc_x<<'\t'<<msc_u<<'\t'<<tv_x<<'\t'<<tv_u<<std::endl;
             }
             std::cout << std::fixed << std::setprecision(2);
             // std::cout.fill(' ');
@@ -265,13 +250,6 @@ int main(int argc, char* argv[]) {
             std::cout.fill('0');
             std::cout.width(8);
             std::cout<<(total_msc_x/success)<<'\t'<<(total_msc_u/success)<<'\t'<<(total_tv_x/success)<<'\t'<<(total_tv_u/success)<<'\t'<<total_duration/success<<'\t'<<min_duration<<'\t'<<max_duration<<std::endl;
-            // std::cout << "Parameter (N = " << N[p1] << ", Sigma_u = " << SIGMA_U[p2] << ")" << std::endl;
-            // std::cout << "Success Rate : " << (int)(((sim_maxiter - fail)/(float)sim_maxiter)*100.0) << "% (Fail : " << fail << "/" << sim_maxiter << ")" << std::endl;
-            // std::cout << "Mean Squared Curvature X : " << total_msc_x << std::endl;
-            // std::cout << "Mean Squared Curvature U : " << total_msc_u << std::endl;
-            // std::cout << "Total Variation X : " << total_tv_x << std::endl;
-            // std::cout << "Total Variation U : " << total_tv_u << std::endl;
-            // std::cout << "Average : " << total_duration/(sim_maxiter-fail) << " Seconds (Total " << total_duration << ")" << std::endl;
         }
     }
 

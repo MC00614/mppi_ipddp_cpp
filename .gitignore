@@ -4,4 +4,4 @@ eigen/
 matplotlibcpp/
 autodiff/
 EigenRand/
-BARN_dataset/
+BARN_dataset/txt_files

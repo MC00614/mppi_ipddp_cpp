@@ -70,12 +70,8 @@ WMRobotMap::WMRobotMap() {
     };
 
     h = [&](Eigen::Ref<Eigen::MatrixXd> U) -> void {
-        for (int i = 0; i < N; ++i) {
-            if (U.col(i)(0) < 0.0) {U.col(i)(0) = 0.0;}
-            else if (1.0 < U.col(i)(0)) {U.col(i)(0) = 1.0;}
-            if (U.col(i)(1) < -1.5) {U.col(i)(1) = -1.5;}
-            else if (1.5 < U.col(i)(1)) {U.col(i)(1) = 1.5;}
-        }
+        U.row(0) = U.row(0).cwiseMax(0.0).cwiseMin(1.0);
+        U.row(1) = U.row(1).cwiseMax(-1.5).cwiseMin(1.5);
         return;
     };
 }

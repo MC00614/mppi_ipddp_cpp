@@ -71,14 +71,6 @@ void CollisionChecker::loadMap(const std::string& file_path, double resolution) 
 
     file.close();
 
-    // Test Parsing
-    // for (const auto& row : map) {
-    //     for (const auto& value : row) {
-    //         std::cout << value << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
-
     with_map = true;
     this->resolution = resolution;
     max_row = map.size();

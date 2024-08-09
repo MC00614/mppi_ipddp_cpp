@@ -88,11 +88,6 @@ void MPPI_IPDDP::solve(int iter) {
         elapsed = finish - start;
         mppi_duration += elapsed.count();
 
-        // TEMP //
-        mppi_X = X;
-        mppi_U = U;
-        // TEMP //
-
         start = std::chrono::high_resolution_clock::now();
         // std::cout<<"corridor"<<std::endl;
         corridor.solve(X, C, R);

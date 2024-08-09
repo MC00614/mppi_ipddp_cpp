@@ -96,22 +96,7 @@ void Corridor::solve(const Eigen::MatrixXd &X, Eigen::MatrixXd &C, Eigen::Vector
 }
 
 void Corridor::hz(Eigen::MatrixXd &Z) {
-    double radius;
-    Eigen::MatrixXd distance_vector;
-    double distance;
-    for (int j = 0; j < N; ++j) {
-        radius = Z(center_point, j);
-        if (radius < -r_max) {radius = -r_max;}
-        else if (radius < 0.0) {radius = -radius;}
-        else if (r_max < radius) {radius = r_max;}
-        Z(center_point, j) = radius;
-
-        // distance_vector = Z.topRows(center_point).col(j) - X.topRows(center_point).col(j);
-        // distance = distance_vector.norm();
-        // if (radius < distance) {
-        //     Z.topRows(center_point).col(j) = X.topRows(center_point).col(j) + radius/distance * distance_vector;
-        // }
-    }
+    Z.row(center_point) = Z.row(center_point).cwiseAbs().cwiseMin(r_max);
 };
 
 Eigen::MatrixXd Corridor::getResC() {
