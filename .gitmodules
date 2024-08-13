@@ -4,5 +4,5 @@
 	url = git@github.com:MC00614/ipddp_cpp.git
 [submodule "mppi"]
 	path = mppi
-	branch = dev_mppi_ipddp
+	branch = main
 	url = git@github.com:MC00614/mppi_cpp.git
